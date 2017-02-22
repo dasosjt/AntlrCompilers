@@ -41,21 +41,30 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 	@Override
 	public String visitMethodDeclaration(DECAFParser.MethodDeclarationContext ctx){
 		System.out.println("visitMethodDeclaration");
+		scope_counter += 1;
+		current_scope.push(scope_counter);
+		System.out.println("--Scope counter : " + String.valueOf(scope_counter));
 		String name;
 		String signature = "";
 		Integer childCount = ctx.getChildCount();
 		name = ctx.getChild(1).getText();
+		//We want the production that has x parameters
 		if(childCount > 5){
-			for(int i = 0; i<childCount-5; i++){
+			Integer parametersCount = (int) Math.floor((childCount-5)/2)+1;
+			System.out.println("Parameter Count " + parametersCount);
+			for(int i = 0; i<parametersCount; i++){
 				//First parameter is at position 3
-				signature += visit(ctx.getChild(3 + i));
+				System.out.println("Parameter " + i + " " + ctx.getChild(3+(2*i)).getText());
+				//signature += visit(ctx.getChild(3 + (2*i)));
+				signature += ctx.getChild(3+(2*i)).getChild(0).getText();
 			}
 		}
-		scope_counter += 1;
-		current_scope.push(scope_counter);
-		System.out.println(name + " " + signature);
+		if(signature.equals("")){
+			System.out.println("Method : "+name + ", no Signature ");
+		} else {
+			System.out.println("Method : "+name + ", Signature: " + signature);
+		}
 		MethodDeclarationTable.put(name+signature, scope_counter);
-		System.out.println("--Scope counter : " + String.valueOf(scope_counter));
 		String result = visitChildren(ctx);
 		return result;
 
