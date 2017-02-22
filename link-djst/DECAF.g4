@@ -60,11 +60,11 @@ structDeclaration: STRUCT ID LBRACE (varDeclaration)* RBRACE;
 
 varType: (INT | CHAR | BOOLEAN | (STRUCT ID) | structDeclaration | VOID);
 		
-methodDeclaration: methodType ID LPARENT (parameter(COMA parameter)*)? RPARENT block;
+methodDeclaration: methodType ID LPARENT (parameterDeclaration(COMA parameterDeclaration)*)? RPARENT block;
 
 methodType: INT | CHAR | BOOLEAN | VOID;
 			
-parameter: parameterType ID | parameterType ID LCORCH RCORCH;
+parameterDeclaration: parameterType ID | parameterType ID LCORCH RCORCH;
 		 
 parameterType: INT | CHAR | BOOLEAN ;
 			

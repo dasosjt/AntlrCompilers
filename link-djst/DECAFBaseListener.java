@@ -99,13 +99,13 @@ public class DECAFBaseListener implements DECAFListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterParameter(DECAFParser.ParameterContext ctx) { }
+	@Override public void enterParameterDeclaration(DECAFParser.ParameterDeclarationContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitParameter(DECAFParser.ParameterContext ctx) { }
+	@Override public void exitParameterDeclaration(DECAFParser.ParameterDeclarationContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

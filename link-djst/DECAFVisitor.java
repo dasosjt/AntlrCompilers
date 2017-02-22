@@ -52,11 +52,11 @@ public interface DECAFVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitMethodType(DECAFParser.MethodTypeContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link DECAFParser#parameter}.
+	 * Visit a parse tree produced by {@link DECAFParser#parameterDeclaration}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitParameter(DECAFParser.ParameterContext ctx);
+	T visitParameterDeclaration(DECAFParser.ParameterDeclarationContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link DECAFParser#parameterType}.
 	 * @param ctx the parse tree

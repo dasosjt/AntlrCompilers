@@ -22,7 +22,7 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 		System.out.println("--Scope counter : " + String.valueOf(scope_counter));
 		String result = visitChildren(ctx);
 		current_scope.pop();
-		System.out.println(MethodDeclarationTable);
+		System.out.println("Method Declaration Table "+MethodDeclarationTable);
 		return result;
 
 	}
@@ -49,13 +49,14 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 		Integer childCount = ctx.getChildCount();
 		name = ctx.getChild(1).getText();
 		//We want the production that has x parameters
+		//Still needs improvement when appears LCORCH RCORCH
 		if(childCount > 5){
 			Integer parametersCount = (int) Math.floor((childCount-5)/2)+1;
 			System.out.println("Parameter Count " + parametersCount);
 			for(int i = 0; i<parametersCount; i++){
 				//First parameter is at position 3
 				System.out.println("Parameter " + i + " " + ctx.getChild(3+(2*i)).getText());
-				//signature += visit(ctx.getChild(3 + (2*i)));
+				//	  += ctx->Parameter->ParameterType->x	
 				signature += ctx.getChild(3+(2*i)).getChild(0).getText();
 			}
 		}
@@ -136,11 +137,11 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 	public String visitParameterType(DECAFParser.ParameterTypeContext ctx){
 		System.out.println("__visitParameterType, " + ctx.getText());
 		if(ctx.getText().equals("int")){
-			return "Integer";
+			return "int";
 		}else if(ctx.getText().equals("char")){
-			return "Char";
+			return "char";
 		}else if(ctx.getText().equals("boolean")){
-			return "Boolean";
+			return "boolean";
 		}
 		return "Error";
 	}
@@ -148,17 +149,17 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 	@Override 
 	public String visitInt_literal(DECAFParser.Int_literalContext ctx){
 		System.out.println("__visitInt_literal, " + ctx.getText());
-		return "Integer";
+		return "int";
 	}
 	@Override
 	public String visitChar_literal(DECAFParser.Char_literalContext ctx){
 		System.out.println("__visitCharLiteral, " + ctx.getText());
-		return "Char";
+		return "char";
 	}
 	
 	@Override 
 	public String visitBool_literal(DECAFParser.Bool_literalContext ctx){
 		System.out.println("__visitBool_literal, " + ctx.getText());
-		return "Boolean";
+		return "boolean";
 	}
 }

@@ -24,7 +24,7 @@ public class DECAFParser extends Parser {
 		EQMTHAN=41, EQLTHAN=42, EQEQ=43, NOTEQ=44;
 	public static final int
 		RULE_program = 0, RULE_declaration = 1, RULE_varDeclaration = 2, RULE_structDeclaration = 3, 
-		RULE_varType = 4, RULE_methodDeclaration = 5, RULE_methodType = 6, RULE_parameter = 7, 
+		RULE_varType = 4, RULE_methodDeclaration = 5, RULE_methodType = 6, RULE_parameterDeclaration = 7, 
 		RULE_parameterType = 8, RULE_block = 9, RULE_statement = 10, RULE_assignation = 11, 
 		RULE_whileBlock = 12, RULE_returnBlock = 13, RULE_print = 14, RULE_scan = 15, 
 		RULE_ifBlock = 16, RULE_elseBlock = 17, RULE_location = 18, RULE_dotLocation = 19, 
@@ -38,9 +38,9 @@ public class DECAFParser extends Parser {
 		RULE_bool_literal = 45;
 	public static final String[] ruleNames = {
 		"program", "declaration", "varDeclaration", "structDeclaration", "varType", 
-		"methodDeclaration", "methodType", "parameter", "parameterType", "block", 
-		"statement", "assignation", "whileBlock", "returnBlock", "print", "scan", 
-		"ifBlock", "elseBlock", "location", "dotLocation", "declaredVariable", 
+		"methodDeclaration", "methodType", "parameterDeclaration", "parameterType", 
+		"block", "statement", "assignation", "whileBlock", "returnBlock", "print", 
+		"scan", "ifBlock", "elseBlock", "location", "dotLocation", "declaredVariable", 
 		"variable", "arrayVariable", "expressionInP", "nExpression", "expression", 
 		"andExpression", "equalsExpression", "relationExpression", "addSubsExpression", 
 		"mulDivExpression", "prExpression", "basicExpression", "basic", "arg", 
@@ -504,11 +504,11 @@ public class DECAFParser extends Parser {
 		public BlockContext block() {
 			return getRuleContext(BlockContext.class,0);
 		}
-		public List<ParameterContext> parameter() {
-			return getRuleContexts(ParameterContext.class);
+		public List<ParameterDeclarationContext> parameterDeclaration() {
+			return getRuleContexts(ParameterDeclarationContext.class);
 		}
-		public ParameterContext parameter(int i) {
-			return getRuleContext(ParameterContext.class,i);
+		public ParameterDeclarationContext parameterDeclaration(int i) {
+			return getRuleContext(ParameterDeclarationContext.class,i);
 		}
 		public List<TerminalNode> COMA() { return getTokens(DECAFParser.COMA); }
 		public TerminalNode COMA(int i) {
@@ -551,7 +551,7 @@ public class DECAFParser extends Parser {
 			if ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << INT) | (1L << CHAR) | (1L << BOOLEAN))) != 0)) {
 				{
 				setState(144);
-				parameter();
+				parameterDeclaration();
 				setState(149);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
@@ -561,7 +561,7 @@ public class DECAFParser extends Parser {
 					setState(145);
 					match(COMA);
 					setState(146);
-					parameter();
+					parameterDeclaration();
 					}
 					}
 					setState(151);
@@ -639,35 +639,35 @@ public class DECAFParser extends Parser {
 		return _localctx;
 	}
 
-	public static class ParameterContext extends ParserRuleContext {
+	public static class ParameterDeclarationContext extends ParserRuleContext {
 		public ParameterTypeContext parameterType() {
 			return getRuleContext(ParameterTypeContext.class,0);
 		}
 		public TerminalNode ID() { return getToken(DECAFParser.ID, 0); }
 		public TerminalNode LCORCH() { return getToken(DECAFParser.LCORCH, 0); }
 		public TerminalNode RCORCH() { return getToken(DECAFParser.RCORCH, 0); }
-		public ParameterContext(ParserRuleContext parent, int invokingState) {
+		public ParameterDeclarationContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
-		@Override public int getRuleIndex() { return RULE_parameter; }
+		@Override public int getRuleIndex() { return RULE_parameterDeclaration; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof DECAFListener ) ((DECAFListener)listener).enterParameter(this);
+			if ( listener instanceof DECAFListener ) ((DECAFListener)listener).enterParameterDeclaration(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof DECAFListener ) ((DECAFListener)listener).exitParameter(this);
+			if ( listener instanceof DECAFListener ) ((DECAFListener)listener).exitParameterDeclaration(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof DECAFVisitor ) return ((DECAFVisitor<? extends T>)visitor).visitParameter(this);
+			if ( visitor instanceof DECAFVisitor ) return ((DECAFVisitor<? extends T>)visitor).visitParameterDeclaration(this);
 			else return visitor.visitChildren(this);
 		}
 	}
 
-	public final ParameterContext parameter() throws RecognitionException {
-		ParameterContext _localctx = new ParameterContext(_ctx, getState());
-		enterRule(_localctx, 14, RULE_parameter);
+	public final ParameterDeclarationContext parameterDeclaration() throws RecognitionException {
+		ParameterDeclarationContext _localctx = new ParameterDeclarationContext(_ctx, getState());
+		enterRule(_localctx, 14, RULE_parameterDeclaration);
 		try {
 			setState(167);
 			_errHandler.sync(this);
@@ -1333,8 +1333,8 @@ public class DECAFParser extends Parser {
 
 	public static class ElseBlockContext extends ParserRuleContext {
 		public TerminalNode ELSE() { return getToken(DECAFParser.ELSE, 0); }
-		public StatementContext statement() {
-			return getRuleContext(StatementContext.class,0);
+		public IfBlockContext ifBlock() {
+			return getRuleContext(IfBlockContext.class,0);
 		}
 		public ElseBlockContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -1367,7 +1367,7 @@ public class DECAFParser extends Parser {
 				setState(237);
 				match(ELSE);
 				setState(238);
-				statement();
+				ifBlock();
 				}
 				break;
 			case TRUE:
@@ -3354,7 +3354,7 @@ public class DECAFParser extends Parser {
 		"\u00e5\7\17\2\2\u00e5\u00e6\7\37\2\2\u00e6\u00e7\7 \2\2\u00e7!\3\2\2\2"+
 		"\u00e8\u00e9\7\b\2\2\u00e9\u00ea\7\37\2\2\u00ea\u00eb\5\64\33\2\u00eb"+
 		"\u00ec\7 \2\2\u00ec\u00ed\5\24\13\2\u00ed\u00ee\5$\23\2\u00ee#\3\2\2\2"+
-		"\u00ef\u00f0\7\t\2\2\u00f0\u00f3\5\26\f\2\u00f1\u00f3\3\2\2\2\u00f2\u00ef"+
+		"\u00ef\u00f0\7\t\2\2\u00f0\u00f3\5\"\22\2\u00f1\u00f3\3\2\2\2\u00f2\u00ef"+
 		"\3\2\2\2\u00f2\u00f1\3\2\2\2\u00f3%\3\2\2\2\u00f4\u00f7\5*\26\2\u00f5"+
 		"\u00f7\5(\25\2\u00f6\u00f4\3\2\2\2\u00f6\u00f5\3\2\2\2\u00f7\'\3\2\2\2"+
 		"\u00f8\u00f9\5,\27\2\u00f9\u00fa\7\"\2\2\u00fa\u00fb\5&\24\2\u00fb\u0101"+

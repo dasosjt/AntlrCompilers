@@ -77,15 +77,15 @@ public interface DECAFListener extends ParseTreeListener {
 	 */
 	void exitMethodType(DECAFParser.MethodTypeContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link DECAFParser#parameter}.
+	 * Enter a parse tree produced by {@link DECAFParser#parameterDeclaration}.
 	 * @param ctx the parse tree
 	 */
-	void enterParameter(DECAFParser.ParameterContext ctx);
+	void enterParameterDeclaration(DECAFParser.ParameterDeclarationContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link DECAFParser#parameter}.
+	 * Exit a parse tree produced by {@link DECAFParser#parameterDeclaration}.
 	 * @param ctx the parse tree
 	 */
-	void exitParameter(DECAFParser.ParameterContext ctx);
+	void exitParameterDeclaration(DECAFParser.ParameterDeclarationContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link DECAFParser#parameterType}.
 	 * @param ctx the parse tree
