@@ -51,13 +51,20 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 		//We want the production that has x parameters
 		//Still needs improvement when appears LCORCH RCORCH
 		if(childCount > 5){
-			Integer parametersCount = (int) Math.floor((childCount-5)/2)+1;
-			System.out.println("Parameter Count " + parametersCount);
-			for(int i = 0; i<parametersCount; i++){
-				//First parameter is at position 3
-				System.out.println("Parameter " + i + " " + ctx.getChild(3+(2*i)).getText());
-				//	  += ctx->Parameter->ParameterType->x	
-				signature += ctx.getChild(3+(2*i)).getChild(0).getText();
+			Integer i = 0;
+			while(i<childCount-5){
+				if(!ctx.getChild(3+i).getText().equals(",")){
+					System.out.println("Parameter " + i + " " + ctx.getChild(3+i).getText());
+					if(ctx.getChild(3+i).getChildCount() == 2){
+						signature += ctx.getChild(3+i).getChild(0).getText();
+					} else {
+						signature += ctx.getChild(3+i).getChild(0).getText();
+						signature += ctx.getChild(3+i).getChild(2).getText();
+						signature += ctx.getChild(3+i).getChild(3).getText();
+
+					}
+				}
+				i++;
 			}
 		}
 		if(signature.equals("")){
