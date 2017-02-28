@@ -3,12 +3,13 @@ import java.util.*;
 public class DECAFTypes extends DECAFBaseVisitor<String> {
 	public int scope_counter;
 	public Stack<Integer> current_scope;
-	public Map<String, Integer> MethodDeclarationTable;
+	public Map<String, ArrayList<Symbol>> SymbolTable;
 		
 	public DECAFTypes(){
 		scope_counter = 0;
 		current_scope = new Stack<Integer>();
-		MethodDeclarationTable = new HashMap<String, Integer>();
+		//MethodDeclarationTable = new HashMap<String, String>();
+		//VarDeclarationTable = new HashMap<String, String[]>();
 	}
 		
 	//Declaration Scope
@@ -22,7 +23,7 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 		System.out.println("--Scope counter : " + String.valueOf(scope_counter));
 		String result = visitChildren(ctx);
 		current_scope.pop();
-		System.out.println("Method Declaration Table "+MethodDeclarationTable);
+	//	System.out.println("Method Declaration Table "+MethodDeclarationTable);
 		return result;
 
 	}
@@ -48,16 +49,18 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 		String signature = "";
 		Integer childCount = ctx.getChildCount();
 		name = ctx.getChild(1).getText();
-		//We want the production that has x parameters
-		//Still needs improvement when appears LCORCH RCORCH
+		//We want the production that has x parameters, so x = childCount - 5
+		//The number 5 is because of the normal parameters that always appear
 		if(childCount > 5){
 			Integer i = 0;
 			while(i<childCount-5){
+				//If we are not looking ","
 				if(!ctx.getChild(3+i).getText().equals(",")){
 					System.out.println("Parameter " + i + " " + ctx.getChild(3+i).getText());
+					//Simple Parameter
 					if(ctx.getChild(3+i).getChildCount() == 2){
 						signature += ctx.getChild(3+i).getChild(0).getText();
-					} else {
+					} else { //[] Parameter
 						signature += ctx.getChild(3+i).getChild(0).getText();
 						signature += ctx.getChild(3+i).getChild(2).getText();
 						signature += ctx.getChild(3+i).getChild(3).getText();
@@ -72,18 +75,35 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 		} else {
 			System.out.println("Method : "+name + ", Signature: " + signature);
 		}
-		MethodDeclarationTable.put(name+signature, scope_counter);
+		//MethodDeclarationTable.put(name+signature, String.valueOf(scope_counter));
 		String result = visitChildren(ctx);
 		return result;
 
 	}
+	
+	@Override
+	public String visitVarDeclaration(DECAFParser.VarDeclarationContext ctx){
+		System.out.println("visitVarDeclaration");
+		String varType = ctx.getChild(0).getText();
+		String id = ctx.getChild(1).getText();
+		//varType ID LCORCH NUM RCORCH DOTCOMMA
+		if(ctx.getChildCount() == 6){
+				
+		} else { //varType ID DOTCOMMA 
+		
+		}
+		System.out.println(ctx.getText());
+		String result = visitChildren(ctx);
+		return result;
+	}
 
+	//Im not pretty sure if new blocks marks a new scope
 	@Override
 	public String visitIfBlock(DECAFParser.IfBlockContext ctx){
 		System.out.println("visitIfBlock");
-		scope_counter += 1;
-		current_scope.push(scope_counter);
-		System.out.println("--Scope counter : " + String.valueOf(scope_counter));
+		//scope_counter += 1;
+		//current_scope.push(scope_counter);
+		//System.out.println("--Scope counter : " + String.valueOf(scope_counter));
 		String result = visitChildren(ctx);
 		return result;
 		
@@ -92,9 +112,9 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 	@Override
 	public String visitWhileBlock(DECAFParser.WhileBlockContext ctx){
 		System.out.println("visitWhileBlock");
-		scope_counter += 1;
-		current_scope.push(scope_counter);
-		System.out.println("--Scope counter : " + String.valueOf(scope_counter));
+		//scope_counter += 1;
+		//current_scope.push(scope_counter);
+		//System.out.println("--Scope counter : " + String.valueOf(scope_counter));
 		String result = visitChildren(ctx);
 		return result;
 	}
