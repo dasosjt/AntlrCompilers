@@ -1,15 +1,19 @@
+import java.util.*;
+
 public class Symbol {
 	public String id;
 	public Boolean isStruct;
 	public Boolean isMethod;
 	public Boolean isVar;
-	public String[] parameters;
+	public Boolean isArray;
+	public Integer arraySize;
+	public ArrayList<String> parameters;
 	public Integer scope;
 	public Integer parentScope;
 	public String returnType;
 	
 	//Struct Constructor
-	public Symbol(String id, Integer scope, Integer parentScope){
+	public Symbol(String id, Integer scope, Integer parentScope, String returnType){
 		this.id = id;
 		this.isStruct = true;
 		this.scope = scope;
@@ -17,7 +21,7 @@ public class Symbol {
 	}
 	
 	//Method Constructor
-	public Symbol(String id, Integer scope, Integer parentScope, String[] parameters, String returnType){
+	public Symbol(String id, Integer scope, Integer parentScope, ArrayList<String> parameters, String returnType){
 		this.id = id;
 		this.isMethod = true;
 		this.scope = scope;
@@ -27,9 +31,11 @@ public class Symbol {
 	}
 
 	//Variable Constructor
-	public Symbol(String id, Integer scope, Integer parentScope, String returnType){
+	public Symbol(String id, Boolean isArray, Integer arraySize, Integer scope, Integer parentScope, String returnType){
 		this.id = id;
 		this.isVar = true;
+		this.isArray = isArray;
+		this.arraySize = arraySize;
 		this.scope = scope; 
 		this.parentScope = parentScope;
 		this.returnType = returnType;

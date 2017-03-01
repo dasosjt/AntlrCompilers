@@ -3,13 +3,12 @@ import java.util.*;
 public class DECAFTypes extends DECAFBaseVisitor<String> {
 	public int scope_counter;
 	public Stack<Integer> current_scope;
-	public Map<String, ArrayList<Symbol>> SymbolTable;
+	public Map<String, ArrayList < Symbol > > SymbolTable;
 		
 	public DECAFTypes(){
 		scope_counter = 0;
 		current_scope = new Stack<Integer>();
-		//MethodDeclarationTable = new HashMap<String, String>();
-		//VarDeclarationTable = new HashMap<String, String[]>();
+		SymbolTable = new HashMap<String, ArrayList < Symbol > >();
 	}
 		
 	//Declaration Scope
@@ -45,40 +44,47 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 		scope_counter += 1;
 		current_scope.push(scope_counter);
 		System.out.println("--Scope counter : " + String.valueOf(scope_counter));
-		String name;
+		ArrayList<String> parameters = new ArrayList<String>();
 		String signature = "";
-		Integer childCount = ctx.getChildCount();
-		name = ctx.getChild(1).getText();
+		String id = ctx.getChild(1).getText();
+		String varType = ctx.getChild(0).getText();
 		//We want the production that has x parameters, so x = childCount - 5
 		//The number 5 is because of the normal parameters that always appear
-		if(childCount > 5){
+		if(ctx.getChildCount() > 5){
 			Integer i = 0;
-			while(i<childCount-5){
-				//If we are not looking ","
+			while(i<ctx.getChildCount()-5){
+				//Until we see "," then we can say that the signature has multiple parameters
 				if(!ctx.getChild(3+i).getText().equals(",")){
 					System.out.println("Parameter " + i + " " + ctx.getChild(3+i).getText());
 					//Simple Parameter
 					if(ctx.getChild(3+i).getChildCount() == 2){
-						signature += ctx.getChild(3+i).getChild(0).getText();
+						parameters.add(ctx.getChild(3+i).getChild(0).getText());
+						signature += ctx.getChild(3+i).getChild(0).getText() + ",";
 					} else { //[] Parameter
-						signature += ctx.getChild(3+i).getChild(0).getText();
-						signature += ctx.getChild(3+i).getChild(2).getText();
-						signature += ctx.getChild(3+i).getChild(3).getText();
+						String temp_parameter = ctx.getChild(3+i).getChild(0).getText() + ctx.getChild(3+i).getChild(2).getText() + ctx.getChild(3+i).getChild(3).getText() + ",";
+						parameters.add(temp_parameter);
+						signature += temp_parameter;
 
 					}
 				}
 				i++;
 			}
 		}
+
 		if(signature.equals("")){
-			System.out.println("Method : "+name + ", no Signature ");
+			System.out.println("Method : "+ id + ", no Signature ");
 		} else {
-			System.out.println("Method : "+name + ", Signature: " + signature);
+			System.out.println("Method : "+ id + ", Signature: " + signature);
 		}
-		//MethodDeclarationTable.put(name+signature, String.valueOf(scope_counter));
+		id = id + signature;
+		if(SymbolTable.containsKey(id)){
+			SymbolTable.get(id).add(new Symbol(id, scope_counter, scope_counter, parameters, varType));
+		} else {
+			SymbolTable.put(id, new ArrayList< Symbol>());
+			SymbolTable.get(id).add(new Symbol(id, scope_counter, scope_counter, parameters, varType));
+		}
 		String result = visitChildren(ctx);
 		return result;
-
 	}
 	
 	@Override
@@ -88,9 +94,20 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 		String id = ctx.getChild(1).getText();
 		//varType ID LCORCH NUM RCORCH DOTCOMMA
 		if(ctx.getChildCount() == 6){
-				
+			Integer arraySize = Integer.parseInt(ctx.getChild(3).getText());
+			if(SymbolTable.containsKey(id)){
+				SymbolTable.get(id).add(new Symbol(id, true, arraySize, scope_counter, scope_counter, varType));
+			} else {
+				SymbolTable.put(id, new ArrayList<Symbol>());
+				SymbolTable.get(id).add(new Symbol(id, true, arraySize, scope_counter, scope_counter, varType));
+			}
 		} else { //varType ID DOTCOMMA 
-		
+			if(SymbolTable.containsKey(id)){
+				SymbolTable.get(id).add(new Symbol(id, false, 0, scope_counter, scope_counter, varType));	
+			} else {
+				SymbolTable.put(id, new ArrayList<Symbol>());
+				SymbolTable.get(id).add(new Symbol(id, false, 0, scope_counter, scope_counter, varType));
+			}	
 		}
 		System.out.println(ctx.getText());
 		String result = visitChildren(ctx);
@@ -101,9 +118,9 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 	@Override
 	public String visitIfBlock(DECAFParser.IfBlockContext ctx){
 		System.out.println("visitIfBlock");
-		//scope_counter += 1;
-		//current_scope.push(scope_counter);
-		//System.out.println("--Scope counter : " + String.valueOf(scope_counter));
+		scope_counter += 1;
+		current_scope.push(scope_counter);
+		System.out.println("--Scope counter : " + String.valueOf(scope_counter));
 		String result = visitChildren(ctx);
 		return result;
 		
@@ -112,9 +129,9 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 	@Override
 	public String visitWhileBlock(DECAFParser.WhileBlockContext ctx){
 		System.out.println("visitWhileBlock");
-		//scope_counter += 1;
-		//current_scope.push(scope_counter);
-		//System.out.println("--Scope counter : " + String.valueOf(scope_counter));
+		scope_counter += 1;
+		current_scope.push(scope_counter);
+		System.out.println("--Scope counter : " + String.valueOf(scope_counter));
 		String result = visitChildren(ctx);
 		return result;
 	}
