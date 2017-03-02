@@ -160,11 +160,11 @@ public interface DECAFVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitNExpression(DECAFParser.NExpressionContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link DECAFParser#expression}.
+	 * Visit a parse tree produced by {@link DECAFParser#orExpression}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitExpression(DECAFParser.ExpressionContext ctx);
+	T visitOrExpression(DECAFParser.OrExpressionContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link DECAFParser#andExpression}.
 	 * @param ctx the parse tree

@@ -70,28 +70,28 @@ parameterType: INT | CHAR | BOOLEAN ;
 			
 block: LBRACE (varDeclaration)* (statement)* RBRACE ;
 
-statement: ifBlock | returnBlock | whileBlock | declaredMethodCall DOTCOMMA | assignation | expression DOTCOMMA | print ;
+statement: ifBlock | returnBlock | whileBlock | declaredMethodCall DOTCOMMA | assignation | orExpression DOTCOMMA | print ;
 
-assignation: location EQ (expression | scan ) DOTCOMMA ;
-whileBlock:  WHILE LPARENT expression RPARENT block ;
+assignation: location EQ (orExpression | scan ) DOTCOMMA ;
+whileBlock:  WHILE LPARENT orExpression RPARENT block ;
 returnBlock: RETURN (nExpression) DOTCOMMA ;
 
 //----------------------Scan Print-------------------------------//
 print: PRINT LPARENT ( STRING | location ) RPARENT DOTCOMMA;
 scan: SCAN LPARENT RPARENT;
 
-ifBlock: IF LPARENT expression RPARENT block elseBlock;
+ifBlock: IF LPARENT orExpression RPARENT block elseBlock;
 elseBlock: ELSE ifBlock | /* epsilon */;
 location: declaredVariable | dotLocation;
 dotLocation: variable ( DOT location) | arrayVariable ( DOT location);
 declaredVariable: variable | arrayVariable;
 variable: ID;
-arrayVariable: ID LCORCH expression RCORCH ;
-expressionInP: LPARENT expression RPARENT ;
+arrayVariable: ID LCORCH orExpression RCORCH ;
+expressionInP: LPARENT orExpression RPARENT ;
 
 //---------------------Operator Priority-------------------------//
-nExpression: expression | ;
-expression: andExpression | expression OR andExpression;
+nExpression: orExpression | ;
+orExpression: andExpression | orExpression OR andExpression;
 andExpression: equalsExpression | andExpression AND equalsExpression;
 equalsExpression: relationExpression | equalsExpression eq_op relationExpression;
 relationExpression: addSubsExpression | relationExpression rel_op addSubsExpression;
@@ -100,7 +100,7 @@ mulDivExpression: prExpression | mulDivExpression md_op prExpression;
 prExpression: basicExpression | prExpression pr_op basicExpression;
 basicExpression: LPARENT (INT|CHAR) RPARENT basic | MINUS basic | EXC basic | basic;
 basic : expressionInP | location | declaredMethodCall | literal;
-arg: expression;
+arg: orExpression;
 declaredMethodCall: ID LPARENT (arg(COMA arg)*)? RPARENT;
 
 //---------------------------Operators---------------------------//

@@ -29,7 +29,7 @@ public class DECAFParser extends Parser {
 		RULE_whileBlock = 12, RULE_returnBlock = 13, RULE_print = 14, RULE_scan = 15, 
 		RULE_ifBlock = 16, RULE_elseBlock = 17, RULE_location = 18, RULE_dotLocation = 19, 
 		RULE_declaredVariable = 20, RULE_variable = 21, RULE_arrayVariable = 22, 
-		RULE_expressionInP = 23, RULE_nExpression = 24, RULE_expression = 25, 
+		RULE_expressionInP = 23, RULE_nExpression = 24, RULE_orExpression = 25, 
 		RULE_andExpression = 26, RULE_equalsExpression = 27, RULE_relationExpression = 28, 
 		RULE_addSubsExpression = 29, RULE_mulDivExpression = 30, RULE_prExpression = 31, 
 		RULE_basicExpression = 32, RULE_basic = 33, RULE_arg = 34, RULE_declaredMethodCall = 35, 
@@ -41,7 +41,7 @@ public class DECAFParser extends Parser {
 		"methodDeclaration", "methodType", "parameterDeclaration", "parameterType", 
 		"block", "statement", "assignation", "whileBlock", "returnBlock", "print", 
 		"scan", "ifBlock", "elseBlock", "location", "dotLocation", "declaredVariable", 
-		"variable", "arrayVariable", "expressionInP", "nExpression", "expression", 
+		"variable", "arrayVariable", "expressionInP", "nExpression", "orExpression", 
 		"andExpression", "equalsExpression", "relationExpression", "addSubsExpression", 
 		"mulDivExpression", "prExpression", "basicExpression", "basic", "arg", 
 		"declaredMethodCall", "as_op", "md_op", "pr_op", "rel_op", "eq_op", "cond_op", 
@@ -860,8 +860,8 @@ public class DECAFParser extends Parser {
 		public AssignationContext assignation() {
 			return getRuleContext(AssignationContext.class,0);
 		}
-		public ExpressionContext expression() {
-			return getRuleContext(ExpressionContext.class,0);
+		public OrExpressionContext orExpression() {
+			return getRuleContext(OrExpressionContext.class,0);
 		}
 		public PrintContext print() {
 			return getRuleContext(PrintContext.class,0);
@@ -933,7 +933,7 @@ public class DECAFParser extends Parser {
 				enterOuterAlt(_localctx, 6);
 				{
 				setState(193);
-				expression(0);
+				orExpression(0);
 				setState(194);
 				match(DOTCOMMA);
 				}
@@ -964,8 +964,8 @@ public class DECAFParser extends Parser {
 		}
 		public TerminalNode EQ() { return getToken(DECAFParser.EQ, 0); }
 		public TerminalNode DOTCOMMA() { return getToken(DECAFParser.DOTCOMMA, 0); }
-		public ExpressionContext expression() {
-			return getRuleContext(ExpressionContext.class,0);
+		public OrExpressionContext orExpression() {
+			return getRuleContext(OrExpressionContext.class,0);
 		}
 		public ScanContext scan() {
 			return getRuleContext(ScanContext.class,0);
@@ -1011,7 +1011,7 @@ public class DECAFParser extends Parser {
 			case EXC:
 				{
 				setState(201);
-				expression(0);
+				orExpression(0);
 				}
 				break;
 			case SCAN:
@@ -1041,8 +1041,8 @@ public class DECAFParser extends Parser {
 	public static class WhileBlockContext extends ParserRuleContext {
 		public TerminalNode WHILE() { return getToken(DECAFParser.WHILE, 0); }
 		public TerminalNode LPARENT() { return getToken(DECAFParser.LPARENT, 0); }
-		public ExpressionContext expression() {
-			return getRuleContext(ExpressionContext.class,0);
+		public OrExpressionContext orExpression() {
+			return getRuleContext(OrExpressionContext.class,0);
 		}
 		public TerminalNode RPARENT() { return getToken(DECAFParser.RPARENT, 0); }
 		public BlockContext block() {
@@ -1078,7 +1078,7 @@ public class DECAFParser extends Parser {
 			setState(208);
 			match(LPARENT);
 			setState(209);
-			expression(0);
+			orExpression(0);
 			setState(210);
 			match(RPARENT);
 			setState(211);
@@ -1271,8 +1271,8 @@ public class DECAFParser extends Parser {
 	public static class IfBlockContext extends ParserRuleContext {
 		public TerminalNode IF() { return getToken(DECAFParser.IF, 0); }
 		public TerminalNode LPARENT() { return getToken(DECAFParser.LPARENT, 0); }
-		public ExpressionContext expression() {
-			return getRuleContext(ExpressionContext.class,0);
+		public OrExpressionContext orExpression() {
+			return getRuleContext(OrExpressionContext.class,0);
 		}
 		public TerminalNode RPARENT() { return getToken(DECAFParser.RPARENT, 0); }
 		public BlockContext block() {
@@ -1311,7 +1311,7 @@ public class DECAFParser extends Parser {
 			setState(231);
 			match(LPARENT);
 			setState(232);
-			expression(0);
+			orExpression(0);
 			setState(233);
 			match(RPARENT);
 			setState(234);
@@ -1643,8 +1643,8 @@ public class DECAFParser extends Parser {
 	public static class ArrayVariableContext extends ParserRuleContext {
 		public TerminalNode ID() { return getToken(DECAFParser.ID, 0); }
 		public TerminalNode LCORCH() { return getToken(DECAFParser.LCORCH, 0); }
-		public ExpressionContext expression() {
-			return getRuleContext(ExpressionContext.class,0);
+		public OrExpressionContext orExpression() {
+			return getRuleContext(OrExpressionContext.class,0);
 		}
 		public TerminalNode RCORCH() { return getToken(DECAFParser.RCORCH, 0); }
 		public ArrayVariableContext(ParserRuleContext parent, int invokingState) {
@@ -1677,7 +1677,7 @@ public class DECAFParser extends Parser {
 			setState(263);
 			match(LCORCH);
 			setState(264);
-			expression(0);
+			orExpression(0);
 			setState(265);
 			match(RCORCH);
 			}
@@ -1695,8 +1695,8 @@ public class DECAFParser extends Parser {
 
 	public static class ExpressionInPContext extends ParserRuleContext {
 		public TerminalNode LPARENT() { return getToken(DECAFParser.LPARENT, 0); }
-		public ExpressionContext expression() {
-			return getRuleContext(ExpressionContext.class,0);
+		public OrExpressionContext orExpression() {
+			return getRuleContext(OrExpressionContext.class,0);
 		}
 		public TerminalNode RPARENT() { return getToken(DECAFParser.RPARENT, 0); }
 		public ExpressionInPContext(ParserRuleContext parent, int invokingState) {
@@ -1727,7 +1727,7 @@ public class DECAFParser extends Parser {
 			setState(267);
 			match(LPARENT);
 			setState(268);
-			expression(0);
+			orExpression(0);
 			setState(269);
 			match(RPARENT);
 			}
@@ -1744,8 +1744,8 @@ public class DECAFParser extends Parser {
 	}
 
 	public static class NExpressionContext extends ParserRuleContext {
-		public ExpressionContext expression() {
-			return getRuleContext(ExpressionContext.class,0);
+		public OrExpressionContext orExpression() {
+			return getRuleContext(OrExpressionContext.class,0);
 		}
 		public NExpressionContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -1783,7 +1783,7 @@ public class DECAFParser extends Parser {
 				enterOuterAlt(_localctx, 1);
 				{
 				setState(271);
-				expression(0);
+				orExpression(0);
 				}
 				break;
 			case DOTCOMMA:
@@ -1806,44 +1806,44 @@ public class DECAFParser extends Parser {
 		return _localctx;
 	}
 
-	public static class ExpressionContext extends ParserRuleContext {
+	public static class OrExpressionContext extends ParserRuleContext {
 		public AndExpressionContext andExpression() {
 			return getRuleContext(AndExpressionContext.class,0);
 		}
-		public ExpressionContext expression() {
-			return getRuleContext(ExpressionContext.class,0);
+		public OrExpressionContext orExpression() {
+			return getRuleContext(OrExpressionContext.class,0);
 		}
 		public TerminalNode OR() { return getToken(DECAFParser.OR, 0); }
-		public ExpressionContext(ParserRuleContext parent, int invokingState) {
+		public OrExpressionContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
-		@Override public int getRuleIndex() { return RULE_expression; }
+		@Override public int getRuleIndex() { return RULE_orExpression; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof DECAFListener ) ((DECAFListener)listener).enterExpression(this);
+			if ( listener instanceof DECAFListener ) ((DECAFListener)listener).enterOrExpression(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof DECAFListener ) ((DECAFListener)listener).exitExpression(this);
+			if ( listener instanceof DECAFListener ) ((DECAFListener)listener).exitOrExpression(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof DECAFVisitor ) return ((DECAFVisitor<? extends T>)visitor).visitExpression(this);
+			if ( visitor instanceof DECAFVisitor ) return ((DECAFVisitor<? extends T>)visitor).visitOrExpression(this);
 			else return visitor.visitChildren(this);
 		}
 	}
 
-	public final ExpressionContext expression() throws RecognitionException {
-		return expression(0);
+	public final OrExpressionContext orExpression() throws RecognitionException {
+		return orExpression(0);
 	}
 
-	private ExpressionContext expression(int _p) throws RecognitionException {
+	private OrExpressionContext orExpression(int _p) throws RecognitionException {
 		ParserRuleContext _parentctx = _ctx;
 		int _parentState = getState();
-		ExpressionContext _localctx = new ExpressionContext(_ctx, _parentState);
-		ExpressionContext _prevctx = _localctx;
+		OrExpressionContext _localctx = new OrExpressionContext(_ctx, _parentState);
+		OrExpressionContext _prevctx = _localctx;
 		int _startState = 50;
-		enterRecursionRule(_localctx, 50, RULE_expression, _p);
+		enterRecursionRule(_localctx, 50, RULE_orExpression, _p);
 		try {
 			int _alt;
 			enterOuterAlt(_localctx, 1);
@@ -1862,8 +1862,8 @@ public class DECAFParser extends Parser {
 					_prevctx = _localctx;
 					{
 					{
-					_localctx = new ExpressionContext(_parentctx, _parentState);
-					pushNewRecursionContext(_localctx, _startState, RULE_expression);
+					_localctx = new OrExpressionContext(_parentctx, _parentState);
+					pushNewRecursionContext(_localctx, _startState, RULE_orExpression);
 					setState(278);
 					if (!(precpred(_ctx, 1))) throw new FailedPredicateException(this, "precpred(_ctx, 1)");
 					setState(279);
@@ -2578,8 +2578,8 @@ public class DECAFParser extends Parser {
 	}
 
 	public static class ArgContext extends ParserRuleContext {
-		public ExpressionContext expression() {
-			return getRuleContext(ExpressionContext.class,0);
+		public OrExpressionContext orExpression() {
+			return getRuleContext(OrExpressionContext.class,0);
 		}
 		public ArgContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -2607,7 +2607,7 @@ public class DECAFParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(374);
-			expression(0);
+			orExpression(0);
 			}
 		}
 		catch (RecognitionException re) {
@@ -3202,7 +3202,7 @@ public class DECAFParser extends Parser {
 	public boolean sempred(RuleContext _localctx, int ruleIndex, int predIndex) {
 		switch (ruleIndex) {
 		case 25:
-			return expression_sempred((ExpressionContext)_localctx, predIndex);
+			return orExpression_sempred((OrExpressionContext)_localctx, predIndex);
 		case 26:
 			return andExpression_sempred((AndExpressionContext)_localctx, predIndex);
 		case 27:
@@ -3218,7 +3218,7 @@ public class DECAFParser extends Parser {
 		}
 		return true;
 	}
-	private boolean expression_sempred(ExpressionContext _localctx, int predIndex) {
+	private boolean orExpression_sempred(OrExpressionContext _localctx, int predIndex) {
 		switch (predIndex) {
 		case 0:
 			return precpred(_ctx, 1);

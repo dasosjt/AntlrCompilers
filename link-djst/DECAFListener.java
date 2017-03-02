@@ -257,15 +257,15 @@ public interface DECAFListener extends ParseTreeListener {
 	 */
 	void exitNExpression(DECAFParser.NExpressionContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link DECAFParser#expression}.
+	 * Enter a parse tree produced by {@link DECAFParser#orExpression}.
 	 * @param ctx the parse tree
 	 */
-	void enterExpression(DECAFParser.ExpressionContext ctx);
+	void enterOrExpression(DECAFParser.OrExpressionContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link DECAFParser#expression}.
+	 * Exit a parse tree produced by {@link DECAFParser#orExpression}.
 	 * @param ctx the parse tree
 	 */
-	void exitExpression(DECAFParser.ExpressionContext ctx);
+	void exitOrExpression(DECAFParser.OrExpressionContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link DECAFParser#andExpression}.
 	 * @param ctx the parse tree

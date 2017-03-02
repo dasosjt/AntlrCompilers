@@ -315,13 +315,13 @@ public class DECAFBaseListener implements DECAFListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterExpression(DECAFParser.ExpressionContext ctx) { }
+	@Override public void enterOrExpression(DECAFParser.OrExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitExpression(DECAFParser.ExpressionContext ctx) { }
+	@Override public void exitOrExpression(DECAFParser.OrExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
