@@ -315,13 +315,12 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 		if(ctx.getChildCount() == 3){
 			//addSubsExpression as_op mulDivExpression
 			String addSubsExpression = visit(ctx.getChild(0));
-			String as_op = visit(ctx.getChild(1));
+			String as_op = ctx.getChild(1).getText();
 			String mulDivExpression = visit(ctx.getChild(2));
 			//print
 			System.out.println("**addSubsExpressionType : "+addSubsExpression);
 			System.out.println("**as_op : "+as_op);
 			System.out.println("**mulDivExpressionType : "+mulDivExpression);
-			addSubsExpression = mulDivExpression;
 			//Return Error if types are different
 			if(addSubsExpression.equals(mulDivExpression)){
 				return addSubsExpression;
@@ -350,7 +349,6 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 			System.out.println("**mulDivExpressionType : "+mulDivExpression);
 			System.out.println("**md_op : " + md_op);
 			System.out.println("**prExpressionType : "+prExpression);
-			mulDivExpression = prExpression;
 			//Return Error if types are different
 			if(mulDivExpression.equals(prExpression)){
 				return mulDivExpression;
@@ -365,6 +363,42 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 		}
 	}
 
+	//Declared Method Call
+	
+	@Override
+	public String visitDeclaredMethodCall(DECAFParser.DeclaredMethodCallContext ctx){
+		System.out.println("visitDeclaredMethodCall");
+		String id = ctx.getChild(0).getText();
+		String signature = "";
+		//We want the production that has x parameters, so x = childCount - 3
+		//The number 3 is because of the normal tokens that always appear
+		if(ctx.getChildCount() > 3){
+			Integer i = 0;
+			while(i<ctx.getChildCount()-3){
+				//Until we see "," then we can say that the signature has multiple parameters
+				if(!ctx.getChild(2+i).getText().equals(",")){
+					System.out.println("Parameter " + i + " " + ctx.getChild(2+i).getText());
+					signature += visit(ctx.getChild(2+i).getChild(0));
+				}
+				i++;
+			}
+		}
+
+		if(signature.equals("")){
+			System.out.println("Method : "+ id + ", no Signature ");
+		} else {
+			System.out.println("Method : "+ id + ", Signature: " + signature);
+		}
+		id = id + signature;
+		if(symbolTablePerScope.peek().lookup(id, 0) != 0){
+			Integer scope_number_up = symbolTablePerScope.peek().lookup(id, 0);
+			System.out.println(String.valueOf(scope_number_up));
+			return symbolTablePerScope.peek().getType(id, scope_number_up);
+		}
+		return "Error";
+
+	}
+
 	//Variable location
 	
 	@Override
@@ -373,6 +407,19 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 		String id = ctx.getChild(0).getText();
 		System.out.println(id);
 		if(symbolTablePerScope.peek().lookup(id, 0) != 0){
+			Integer scope_number_up = symbolTablePerScope.peek().lookup(id, 0);
+			System.out.println(String.valueOf(scope_number_up));
+			return symbolTablePerScope.peek().getType(id, scope_number_up);
+		}
+		return "Error";
+	}
+
+	@Override 
+	public String visitArrayVariable(DECAFParser.ArrayVariableContext ctx){
+		System.out.println("visitArrayVariable");
+		String id = ctx.getChild(0).getText();
+		String number = visit(ctx.getChild(2));
+		if((symbolTablePerScope.peek().lookup(id, 0) != 0) && (number.equals("int"))){
 			Integer scope_number_up = symbolTablePerScope.peek().lookup(id, 0);
 			System.out.println(String.valueOf(scope_number_up));
 			return symbolTablePerScope.peek().getType(id, scope_number_up);
