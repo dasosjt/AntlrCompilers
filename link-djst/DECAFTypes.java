@@ -3,13 +3,12 @@ import java.util.*;
 public class DECAFTypes extends DECAFBaseVisitor<String> {
 	public Integer scope_counter;
 	public Stack<SymbolTable> symbolTablePerScope;
-	public Map<String, ArrayList < Symbol > > SymbolTable;
+	public ArrayList<SymbolTable> symbolTablePerScopeArray;
 		
 	public DECAFTypes(){
 		scope_counter = 0;
-		current_scope = new Stack<Integer>();
-		symbolTablePerScope = new Stack<SymbolTable>;
-		SymbolTable = new HashMap<String, ArrayList < Symbol > >();
+		symbolTablePerScope = new Stack<SymbolTable>();
+		symbolTablePerScopeArray = new ArrayList<SymbolTable>();
 	}
 		
 	//Declaration Scope
@@ -22,16 +21,10 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 		symbolTablePerScope.push(new SymbolTable(scope_counter, null));
 		System.out.println("--Scope counter : " + String.valueOf(scope_counter));
 		String result = visitChildren(ctx);
+		symbolTablePerScope.pop();
 		//System.out.println("Symbol Table "+SymbolTable);
 		return result;
 
-	}
-	public String visitBlock(DECAFParser.BlockContext ctx){
-		System.out.println("visitBlock");
-		scope_counter += 1;
-		symBolTablePerScope.push(new SymbolTable(scope_counter, symBolTablePerScope.top()));
-		String result = visitChildren(ctx);
-		return result;
 	}
 
 
@@ -86,14 +79,22 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 			System.out.println("Method : "+ id + ", Signature: " + signature);
 		}
 		id = id + signature;
-		//if(SymbolTable.containsKey(id)){
-			//Multiple methods with same name and signature.. this must be a error
-		//	SymbolTable.get(id).add(new Symbol(id, scope_counter, scope_counter, parameters, varType));
-		//} else {
-		//	SymbolTable.put(id, new ArrayList< Symbol>());
-		//	SymbolTable.get(id).add(new Symbol(id, scope_counter, scope_counter, parameters, varType));
-		//}
+		scope_counter += 1;
+		if(symbolTablePerScope.peek().lookup(id, 0) == 0){
+			symbolTablePerScope.peek().insert(id, new Symbol(id, scope_counter, scope_counter, parameters, varType));
+			symbolTablePerScope.peek().print();
+			//father
+			SymbolTable symbTable = new SymbolTable(scope_counter, symbolTablePerScope.peek());
+			//children
+			symbolTablePerScope.peek().children.add(symbTable);
+			//new current symbTable
+			symbolTablePerScope.push(symbTable);
+		} else {
+			return "Error";
+		}
+		System.out.println("--Scope counter : "+scope_counter);
 		String result = visitChildren(ctx);
+		symbolTablePerScope.pop();
 		return result;
 	}
 	
@@ -105,9 +106,12 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 		//varType ID LCORCH NUM RCORCH DOTCOMMA
 		if(ctx.getChildCount() == 6){
 			Integer arraySize = Integer.parseInt(ctx.getChild(3).getText());
-		SymbolTablePerScope.top().insert(scope_counter, new Symbol(id, true, arraySize, scope_counter, scope_counter, varTye));
+			symbolTablePerScope.peek().insert(id, new Symbol(id, true, arraySize, scope_counter, scope_counter, varType));
+			symbolTablePerScope.peek().print();
 		} else { //varType ID DOTCOMMA 
-			SymbolTablePerScope.top().insert(scope_counter, new Symbol(id, false, 0, scope_counter, scope_counter, varTye));
+			SymbolTable symbolTable = new SymbolTable(scope_counter, symbolTablePerScope.peek());
+			symbolTablePerScope.peek().insert(id, new Symbol(id, false, 0, scope_counter, scope_counter, varType));
+			symbolTablePerScope.peek().print();
 		}
 		System.out.println(ctx.getText());
 		String result = visitChildren(ctx);
@@ -118,7 +122,16 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 	@Override
 	public String visitIfBlock(DECAFParser.IfBlockContext ctx){
 		System.out.println("visitIfBlock");
+		scope_counter += 1;
+		System.out.println("--Scope counter : "+String.valueOf(scope_counter));
+		//father
+		SymbolTable symbTable = new SymbolTable(scope_counter, symbolTablePerScope.peek());
+		//children
+		symbolTablePerScope.peek().children.add(symbTable);
+		//new current symbTable
+		symbolTablePerScope.push(symbTable);
 		String result = visitChildren(ctx);
+		symbolTablePerScope.pop();
 		return result;
 		
 	}
@@ -126,7 +139,16 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 	@Override
 	public String visitWhileBlock(DECAFParser.WhileBlockContext ctx){
 		System.out.println("visitWhileBlock");
+		scope_counter += 1;
+		System.out.println("--Scope counter : "+String.valueOf(scope_counter));
+		//father
+		SymbolTable symbTable = new SymbolTable(scope_counter, symbolTablePerScope.peek());
+		//children
+		symbolTablePerScope.peek().children.add(symbTable);
+		//new current symbTable
+		symbolTablePerScope.push(symbTable);
 		String result = visitChildren(ctx);
+		symbolTablePerScope.pop();
 		return result;
 	}
 
@@ -175,7 +197,7 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 			}
 		} else {
 			//andExpression
-			String andExpression = visit(ctx.getChild(2));
+			String andExpression = visit(ctx.getChild(0));
 			System.out.println("**andExpressionType");
 			return andExpression;
 		}
