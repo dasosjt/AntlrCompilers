@@ -1,13 +1,14 @@
 import java.util.*;
 
 public class DECAFTypes extends DECAFBaseVisitor<String> {
-	public int scope_counter;
-	public Stack<Integer> current_scope;
+	public Integer scope_counter;
+	public Stack<SymbolTable> symbolTablePerScope;
 	public Map<String, ArrayList < Symbol > > SymbolTable;
 		
 	public DECAFTypes(){
 		scope_counter = 0;
 		current_scope = new Stack<Integer>();
+		symbolTablePerScope = new Stack<SymbolTable>;
 		SymbolTable = new HashMap<String, ArrayList < Symbol > >();
 	}
 		
@@ -18,28 +19,32 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 		System.out.println("visitProgram");
 		//System.out.println(ctx.getText());
 		scope_counter += 1;
-		current_scope.push(scope_counter);
+		symbolTablePerScope.push(new SymbolTable(scope_counter, null));
 		System.out.println("--Scope counter : " + String.valueOf(scope_counter));
 		String result = visitChildren(ctx);
-		current_scope.pop();
-		System.out.println("Symbol Table "+SymbolTable);
+		//System.out.println("Symbol Table "+SymbolTable);
 		return result;
 
 	}
+	public String visitBlock(DECAFParser.BlockContext ctx){
+		System.out.println("visitBlock");
+		scope_counter += 1;
+		symBolTablePerScope.push(new SymbolTable(scope_counter, symBolTablePerScope.top()));
+		String result = visitChildren(ctx);
+		return result;
+	}
+
 
 	@Override
 	public String visitStructDeclaration(DECAFParser.StructDeclarationContext ctx){
 		System.out.println("visitStructDeclaration");
-		scope_counter += 1;
-		current_scope.push(scope_counter);
-		System.out.println("--Scope counter : " + String.valueOf(scope_counter));
 		String id = ctx.getChild(1).getText();
-		if(SymbolTable.containsKey(id)){
-			SymbolTable.get(id).add(new Symbol(id, scope_counter, scope_counter, id));
-		} else {
-			SymbolTable.put(id, new ArrayList<Symbol>());
-			SymbolTable.get(id).add(new Symbol(id, scope_counter, scope_counter, id));
-		}
+		//if(SymbolTable.containsKey(id)){
+		//	SymbolTable.get(id).add(new Symbol(id, scope_counter, scope_counter, id));
+		//} else {
+		//	SymbolTable.put(id, new ArrayList<Symbol>());
+		//	SymbolTable.get(id).add(new Symbol(id, scope_counter, scope_counter, id));
+		//}
 		String result = visitChildren(ctx);
 		return result;
 
@@ -48,9 +53,6 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 	@Override
 	public String visitMethodDeclaration(DECAFParser.MethodDeclarationContext ctx){
 		System.out.println("visitMethodDeclaration");
-		scope_counter += 1;
-		current_scope.push(scope_counter);
-		System.out.println("--Scope counter : " + String.valueOf(scope_counter));
 		ArrayList<String> parameters = new ArrayList<String>();
 		String signature = "";
 		String id = ctx.getChild(1).getText();
@@ -84,13 +86,13 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 			System.out.println("Method : "+ id + ", Signature: " + signature);
 		}
 		id = id + signature;
-		if(SymbolTable.containsKey(id)){
+		//if(SymbolTable.containsKey(id)){
 			//Multiple methods with same name and signature.. this must be a error
-			SymbolTable.get(id).add(new Symbol(id, scope_counter, scope_counter, parameters, varType));
-		} else {
-			SymbolTable.put(id, new ArrayList< Symbol>());
-			SymbolTable.get(id).add(new Symbol(id, scope_counter, scope_counter, parameters, varType));
-		}
+		//	SymbolTable.get(id).add(new Symbol(id, scope_counter, scope_counter, parameters, varType));
+		//} else {
+		//	SymbolTable.put(id, new ArrayList< Symbol>());
+		//	SymbolTable.get(id).add(new Symbol(id, scope_counter, scope_counter, parameters, varType));
+		//}
 		String result = visitChildren(ctx);
 		return result;
 	}
@@ -103,21 +105,9 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 		//varType ID LCORCH NUM RCORCH DOTCOMMA
 		if(ctx.getChildCount() == 6){
 			Integer arraySize = Integer.parseInt(ctx.getChild(3).getText());
-			if(SymbolTable.containsKey(id)){
-				//This one depends of the scope
-				SymbolTable.get(id).add(new Symbol(id, true, arraySize, scope_counter, scope_counter, varType));
-			} else {
-				SymbolTable.put(id, new ArrayList<Symbol>());
-				SymbolTable.get(id).add(new Symbol(id, true, arraySize, scope_counter, scope_counter, varType));
-			}
+		SymbolTablePerScope.top().insert(scope_counter, new Symbol(id, true, arraySize, scope_counter, scope_counter, varTye));
 		} else { //varType ID DOTCOMMA 
-			if(SymbolTable.containsKey(id)){
-				//This one depends of the scope
-				SymbolTable.get(id).add(new Symbol(id, false, 0, scope_counter, scope_counter, varType));	
-			} else {
-				SymbolTable.put(id, new ArrayList<Symbol>());
-				SymbolTable.get(id).add(new Symbol(id, false, 0, scope_counter, scope_counter, varType));
-			}	
+			SymbolTablePerScope.top().insert(scope_counter, new Symbol(id, false, 0, scope_counter, scope_counter, varTye));
 		}
 		System.out.println(ctx.getText());
 		String result = visitChildren(ctx);
@@ -128,9 +118,6 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 	@Override
 	public String visitIfBlock(DECAFParser.IfBlockContext ctx){
 		System.out.println("visitIfBlock");
-		scope_counter += 1;
-		current_scope.push(scope_counter);
-		System.out.println("--Scope counter : " + String.valueOf(scope_counter));
 		String result = visitChildren(ctx);
 		return result;
 		
@@ -139,9 +126,6 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 	@Override
 	public String visitWhileBlock(DECAFParser.WhileBlockContext ctx){
 		System.out.println("visitWhileBlock");
-		scope_counter += 1;
-		current_scope.push(scope_counter);
-		System.out.println("--Scope counter : " + String.valueOf(scope_counter));
 		String result = visitChildren(ctx);
 		return result;
 	}
@@ -169,7 +153,7 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 		}
 	}
 
-	//AND, EQ and OR operations
+	//AND, EQ, OR and RELATION operations
 	
 	@Override
 	public String visitOrExpression(DECAFParser.OrExpressionContext ctx){
@@ -209,7 +193,7 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 			//print 
 			System.out.println("**andExpressionType : "+andExpression);
 			System.out.println("**and : "+and);
-			System.out.println("equalsExpressionType : "+equalsExpression);
+			System.out.println("**equalsExpressionType : "+equalsExpression);
 			if(andExpression.equals(equalsExpression)){
 				return andExpression;
 			} else {
@@ -221,6 +205,58 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 			System.out.println("**equalsExpressionType :"+equalsExpression);
 			return equalsExpression;
 		}
+	}
+
+	@Override
+	public String visitEqualsExpression(DECAFParser.EqualsExpressionContext ctx){
+		System.out.println("visitEqualsExpression");
+		System.out.println(String.valueOf(ctx.getChildCount()));
+		if(ctx.getChildCount() == 3){
+			//equalsExpression eq_op relationExpression
+			String equalsExpression = visit(ctx.getChild(0));
+			String eq_op = visit(ctx.getChild(1));
+			String relationExpression = visit(ctx.getChild(2));
+			//print 
+			System.out.println("**equalsExpressionType : "+equalsExpression);
+			System.out.println("**eq_op : "+eq_op);
+			System.out.println("**relationExpressionType : "+relationExpression);
+			if(equalsExpression.equals(relationExpression)){
+				return equalsExpression;
+			} else {
+				return "Error";
+			}
+		} else {
+			//relationExpression
+			String relationExpression = visit(ctx.getChild(0));
+			System.out.println("**relationExpressionType : "+relationExpression);
+			return relationExpression;
+		}
+	}
+
+	@Override
+	public String visitRelationExpression(DECAFParser.RelationExpressionContext ctx){
+		System.out.println("visitRelationExpression");
+		System.out.println(String.valueOf(ctx.getChildCount()));
+		if(ctx.getChildCount() == 3){
+			//relationExpression rel_op addSubsExpression
+			String relationExpression = visit(ctx.getChild(0));
+			String rel_op = visit(ctx.getChild(1));
+			String addSubsExpression = visit(ctx.getChild(2));
+			//print
+			System.out.println("**relationExpresionType : "+relationExpression);
+			System.out.println("**rel_op : "+rel_op);
+			System.out.println("**addSubsExpression : "+addSubsExpression);
+			if(relationExpression.equals(addSubsExpression)){
+				return relationExpression;
+			} else {
+				return "Error";
+			}
+		} else {
+			//addSubsExpression
+			String addSubsExpression = visit(ctx.getChild(0));
+			System.out.println("**addSubsExpression");
+			return addSubsExpression;
+		}	
 	}
 
 	//AddSubs and MulDiv operations
