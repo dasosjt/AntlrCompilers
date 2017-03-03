@@ -28,6 +28,15 @@ public class SymbolTable {
 			}
 		}
 	}
+
+	public String getType(String id, Integer level){
+		if(level == 1){
+			return map.get(id).returnType;
+		} else {
+			level -= 1;
+			return parent.getType(id, level);
+		}
+	}
        
 	public void print(){
 		System.out.println("Scope id "+String.valueOf(scope_id)+" : "+map);

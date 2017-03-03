@@ -61,9 +61,11 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 					//Simple Parameter
 					if(ctx.getChild(3+i).getChildCount() == 2){
 						parameters.add(ctx.getChild(3+i).getChild(0).getText());
-						signature += ctx.getChild(3+i).getChild(0).getText() + ",";
+						signature += ctx.getChild(3+i).getChild(0).getText();
 					} else { //[] Parameter
-						String temp_parameter = ctx.getChild(3+i).getChild(0).getText() + ctx.getChild(3+i).getChild(2).getText() + ctx.getChild(3+i).getChild(3).getText() + ",";
+						String temp_parameter = ctx.getChild(3+i).getChild(0).getText();
+						temp_parameter += ctx.getChild(3+i).getChild(2).getText();
+						temp_parameter += ctx.getChild(3+i).getChild(3).getText();
 						parameters.add(temp_parameter);
 						signature += temp_parameter;
 
@@ -97,25 +99,49 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 		symbolTablePerScope.pop();
 		return result;
 	}
+
+	@Override
+	public String visitParameterDeclaration(DECAFParser.ParameterDeclarationContext ctx){
+		System.out.println("visitParameterDeclaration");
+		String varType = ctx.getChild(0).getText();
+		String id = ctx.getChild(1).getText();
+		//parameterType ID LCORCH RCORCH
+		if((symbolTablePerScope.peek().lookup(id, 0) == 0) || (symbolTablePerScope.peek().lookup(id, 0) != 1)){//Can't be declared in the same scope
+			//or Could have never been declared
+			if(ctx.getChildCount() == 4){
+				symbolTablePerScope.peek().insert(id, new Symbol(id, true, 0, scope_counter, scope_counter, varType));
+			} else { //parameterType ID
+				symbolTablePerScope.peek().insert(id, new Symbol(id, false, 0, scope_counter, scope_counter, varType));
+			}
+			symbolTablePerScope.peek().print();
+			return "";
+		} else {
+			return "Error";
+		}
+	}
 	
 	@Override
 	public String visitVarDeclaration(DECAFParser.VarDeclarationContext ctx){
 		System.out.println("visitVarDeclaration");
 		String varType = ctx.getChild(0).getText();
 		String id = ctx.getChild(1).getText();
-		//varType ID LCORCH NUM RCORCH DOTCOMMA
-		if(ctx.getChildCount() == 6){
-			Integer arraySize = Integer.parseInt(ctx.getChild(3).getText());
-			symbolTablePerScope.peek().insert(id, new Symbol(id, true, arraySize, scope_counter, scope_counter, varType));
-			symbolTablePerScope.peek().print();
-		} else { //varType ID DOTCOMMA 
-			SymbolTable symbolTable = new SymbolTable(scope_counter, symbolTablePerScope.peek());
-			symbolTablePerScope.peek().insert(id, new Symbol(id, false, 0, scope_counter, scope_counter, varType));
-			symbolTablePerScope.peek().print();
+		if((symbolTablePerScope.peek().lookup(id, 0) == 0) || (symbolTablePerScope.peek().lookup(id, 0) != 1)){
+			//varType ID LCORCH NUM RCORCH DOTCOMMA
+			if(ctx.getChildCount() == 6){
+				Integer arraySize = Integer.parseInt(ctx.getChild(3).getText());
+				symbolTablePerScope.peek().insert(id, new Symbol(id, true, arraySize, scope_counter, scope_counter, varType));
+				symbolTablePerScope.peek().print();
+			} else { //varType ID DOTCOMMA 
+				SymbolTable symbolTable = new SymbolTable(scope_counter, symbolTablePerScope.peek());
+				symbolTablePerScope.peek().insert(id, new Symbol(id, false, 0, scope_counter, scope_counter, varType));
+				symbolTablePerScope.peek().print();
+			}
+			System.out.println(ctx.getText());
+			String result = visitChildren(ctx);
+			return result;
+		} else {
+			return "Error";
 		}
-		System.out.println(ctx.getText());
-		String result = visitChildren(ctx);
-		return result;
 	}
 
 	//Im not pretty sure if new blocks marks a new scope
@@ -166,7 +192,6 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 		System.out.println("**locationType : "+location);
 		System.out.println("**eq : "+eq);
 		System.out.println("**(expression|scan)Type : "+expressionscan);
-		location = expressionscan;
 		//Return Error if types are different
 		if(location.equals(expressionscan)){
 			return location;
@@ -276,7 +301,7 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 		} else {
 			//addSubsExpression
 			String addSubsExpression = visit(ctx.getChild(0));
-			System.out.println("**addSubsExpression");
+			System.out.println("**addSubsExpression : "+addSubsExpression);
 			return addSubsExpression;
 		}	
 	}
@@ -338,6 +363,21 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 			System.out.println("**prExpressionType : "+prExpression);
 			return prExpression;
 		}
+	}
+
+	//Variable location
+	
+	@Override
+	public String visitVariable(DECAFParser.VariableContext ctx){
+		System.out.println("visitVariable");
+		String id = ctx.getChild(0).getText();
+		System.out.println(id);
+		if(symbolTablePerScope.peek().lookup(id, 0) != 0){
+			Integer scope_number_up = symbolTablePerScope.peek().lookup(id, 0);
+			System.out.println(String.valueOf(scope_number_up));
+			return symbolTablePerScope.peek().getType(id, scope_number_up);
+		}
+		return "Error";
 	}
 	
 	//Integer, Char and Boolean Literals
