@@ -440,7 +440,7 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 	@Override 
 	public String visitLocation(DECAFParser.LocationContext ctx){
 		System.out.println("visitLocation");
-		if(ctx.getChild(0).getChildCount() == 3){
+		if(ctx.getChild(0).getChildCount() == 3 && ctx.getChild(0).getChild(2).getChild(0).getChildCount() == 1){
 			System.out.println("variable/arraVariable ( DOT Location )");
 			String id = ctx.getChild(0).getChild(0).getChild(0).getText();
 			//So.. we have to track down this variable in struct declaration..
@@ -461,6 +461,9 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 					}
 				}
 			}
+		} else if(ctx.getChild(0).getChildCount() == 3 && ctx.getChild(0).getChild(2).getChild(0).getChildCount() == 3){
+			System.out.println("looking for the real");
+			return visit(ctx.getChild(0).getChild(2));
 		} else {
 			System.out.println("Just Location");
 			String id = ctx.getChild(0).getChild(0).getText();
