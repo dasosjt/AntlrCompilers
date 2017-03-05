@@ -142,6 +142,13 @@ public class DECAFBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements 
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
+	@Override public T visitElseTailBlock(DECAFParser.ElseTailBlockContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
 	@Override public T visitLocation(DECAFParser.LocationContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}

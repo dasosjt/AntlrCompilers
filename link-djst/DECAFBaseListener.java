@@ -231,6 +231,18 @@ public class DECAFBaseListener implements DECAFListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterElseTailBlock(DECAFParser.ElseTailBlockContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitElseTailBlock(DECAFParser.ElseTailBlockContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterLocation(DECAFParser.LocationContext ctx) { }
 	/**
 	 * {@inheritDoc}

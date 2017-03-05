@@ -187,6 +187,16 @@ public interface DECAFListener extends ParseTreeListener {
 	 */
 	void exitElseBlock(DECAFParser.ElseBlockContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link DECAFParser#elseTailBlock}.
+	 * @param ctx the parse tree
+	 */
+	void enterElseTailBlock(DECAFParser.ElseTailBlockContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link DECAFParser#elseTailBlock}.
+	 * @param ctx the parse tree
+	 */
+	void exitElseTailBlock(DECAFParser.ElseTailBlockContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link DECAFParser#location}.
 	 * @param ctx the parse tree
 	 */

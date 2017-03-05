@@ -118,6 +118,12 @@ public interface DECAFVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitElseBlock(DECAFParser.ElseBlockContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link DECAFParser#elseTailBlock}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitElseTailBlock(DECAFParser.ElseTailBlockContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link DECAFParser#location}.
 	 * @param ctx the parse tree
 	 * @return the visitor result

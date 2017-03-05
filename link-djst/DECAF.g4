@@ -81,7 +81,8 @@ print: PRINT LPARENT ( STRING | location ) RPARENT DOTCOMMA;
 scan: SCAN LPARENT RPARENT;
 
 ifBlock: IF LPARENT orExpression RPARENT block elseBlock;
-elseBlock: ELSE ifBlock | ELSE block | /* epsilon */;
+elseBlock: ELSE ifBlock | elseTailBlock | /* epsilon */;
+elseTailBlock: ELSE block;
 location: declaredVariable | dotLocation;
 dotLocation: variable ( DOT location) | arrayVariable ( DOT location);
 declaredVariable: variable | arrayVariable;

@@ -215,6 +215,24 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 		return "";
 	}
 
+	@Override
+	public String visitElseTailBlock(DECAFParser.ElseTailBlockContext ctx){
+		System.out.println("visitElseTailBlock");
+		scope_counter += 1;
+		System.out.println("--Scope counter : "+String.valueOf(scope_counter));
+		//father
+		SymbolTable symbTable = new SymbolTable(scope_counter, symbolTablePerScope.peek());
+		//children
+		symbolTablePerScope.peek().children.add(symbTable);
+		//new current symbTable
+		symbolTablePerScope.push(symbTable);
+		//ELSE block
+		String result = visit(ctx.getChild(1));
+		symbolTablePerScope.pop();
+		return "";
+
+	}
+
 	//assignation
 	
 	@Override 
