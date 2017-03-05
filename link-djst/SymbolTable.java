@@ -13,6 +13,10 @@ public class SymbolTable {
 		children = new ArrayList<SymbolTable>();
 	}
 
+	public Symbol searchSymbol(String id){
+		return map.get(id);
+	}
+
 	public void insert(String id, Symbol symb){
 		map.put(id, symb);
 	}
@@ -29,12 +33,25 @@ public class SymbolTable {
 		}
 	}
 
+	public Boolean lookupGlobal(String id){
+		return this.map.containsKey(id);
+	}
+
 	public String getType(String id, Integer level){
 		if(level == 1){
 			return map.get(id).returnType;
 		} else {
 			level -= 1;
 			return parent.getType(id, level);
+		}
+	}
+
+	public Boolean isArray(String id, Integer level){
+		if(level == 1){
+			return map.get(id).isArray;
+		} else {
+			level -= 1;
+			return parent.isArray(id, level);
 		}
 	}
        

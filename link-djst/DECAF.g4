@@ -54,7 +54,7 @@ program: CLASS ID LBRACE (declaration)* RBRACE;
 
 declaration: structDeclaration | varDeclaration | methodDeclaration;
 			
-varDeclaration: varType ID DOTCOMMA | varType ID LCORCH NUM RCORCH DOTCOMMA ;
+varDeclaration: varType ID DOTCOMMA | varType ID LCORCH NUM RCORCH DOTCOMMA | ID ID DOTCOMMA ;
 
 structDeclaration: STRUCT ID LBRACE (varDeclaration)* RBRACE;
 

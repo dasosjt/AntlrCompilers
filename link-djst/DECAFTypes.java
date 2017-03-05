@@ -4,11 +4,14 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 	public Integer scope_counter;
 	public Stack<SymbolTable> symbolTablePerScope;
 	public ArrayList<SymbolTable> symbolTablePerScopeArray;
+	public SymbolTable globalTable;
 		
 	public DECAFTypes(){
 		scope_counter = 0;
 		symbolTablePerScope = new Stack<SymbolTable>();
 		symbolTablePerScopeArray = new ArrayList<SymbolTable>();
+		scope_counter += 1;
+		globalTable = new SymbolTable(scope_counter, null);
 	}
 		
 	//Declaration Scope
@@ -17,13 +20,16 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 	public String visitProgram(DECAFParser.ProgramContext ctx){
 		System.out.println("visitProgram");
 		//System.out.println(ctx.getText());
-		scope_counter += 1;
-		symbolTablePerScope.push(new SymbolTable(scope_counter, null));
+		symbolTablePerScope.push(globalTable);
 		System.out.println("--Scope counter : " + String.valueOf(scope_counter));
 		String result = visitChildren(ctx);
-		symbolTablePerScope.pop();
-		//System.out.println("Symbol Table "+SymbolTable);
-		return result;
+		if(symbolTablePerScope.peek().lookup("main", 0) == 1){
+			symbolTablePerScope.pop();
+			//System.out.println("Symbol Table "+SymbolTable);
+			return result;
+		} else {
+			return "Error";
+		}
 
 	}
 
@@ -31,14 +37,25 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 	@Override
 	public String visitStructDeclaration(DECAFParser.StructDeclarationContext ctx){
 		System.out.println("visitStructDeclaration");
-		String id = ctx.getChild(1).getText();
-		//if(SymbolTable.containsKey(id)){
-		//	SymbolTable.get(id).add(new Symbol(id, scope_counter, scope_counter, id));
-		//} else {
-		//	SymbolTable.put(id, new ArrayList<Symbol>());
-		//	SymbolTable.get(id).add(new Symbol(id, scope_counter, scope_counter, id));
-		//}
+		String id = ctx.getChild(1).getText();		
+		System.out.println("--Scope counter : "+scope_counter);
+		if(symbolTablePerScope.peek().lookup(id, 0) == 0){
+			//scope counter plus;
+			//
+			scope_counter += 1;
+			//father
+			SymbolTable symbTable = new SymbolTable(scope_counter, symbolTablePerScope.peek());
+			symbolTablePerScope.peek().insert(id, new Symbol(id, symbTable, id));
+			symbolTablePerScope.peek().print();
+			//children
+			symbolTablePerScope.peek().children.add(symbTable);
+			//new current symbTable
+			symbolTablePerScope.push(symbTable);
+		} else {
+			return "Error";
+		}
 		String result = visitChildren(ctx);
+		symbolTablePerScope.pop();
 		return result;
 
 	}
@@ -208,6 +225,7 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 		if(location.equals(expressionscan)){
 			return location;
 		} else {
+			System.out.println("Error");
 			return "Error";
 		}
 	}
@@ -412,13 +430,40 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 
 	}
 
-	//dotLocation
+	//Location
 	
 	@Override 
-	public String visitDotLocation(DECAFParser.DotLocationContext ctx){
-		System.out.println("visitDotLocation");
-		String result = visit(ctx.getChild(2));
-		return result;
+	public String visitLocation(DECAFParser.LocationContext ctx){
+		System.out.println("visitLocation");
+		if(ctx.getChild(0).getChildCount() == 3){
+			System.out.println("variable/arraVariable ( DOT Location )");
+			String id = ctx.getChild(0).getChild(0).getChild(0).getText();
+			//So.. we have to track down this variable in struct declaration..
+			//and all the struct declaration belongs to the global scope.
+			System.out.println("variable/arrayVariable ID : "+id);
+			String var = visit(ctx.getChild(0).getChild(2));
+			System.out.println("var : "+ var);
+			globalTable.print();
+			Integer level = symbolTablePerScope.peek().lookup(id, 0);
+			if(level != 0){
+				String structType = symbolTablePerScope.peek().getType(id, level);
+				if(globalTable.lookupGlobal(structType)){
+					System.out.println("Found "+ structType + " in GlobalTable");
+					if(globalTable.searchSymbol(structType).variables.lookup(var, 0) == 1){
+						System.out.println("we have found that symbol ID in its variables has the variable..\n so we need to return the type");
+						Integer structVariableTypeLevel = globalTable.searchSymbol(structType).variables.lookup(var, 0);
+						return globalTable.searchSymbol(structType).variables.getType(var, structVariableTypeLevel);
+					}
+				}
+			}
+		} else {
+			System.out.println("Just Location");
+			String id = ctx.getChild(0).getChild(0).getText();
+			System.out.println("Location ID : "+id);
+			return id;
+		}
+		return "Error";
+
 	}
 
 	//Variable location
@@ -441,10 +486,14 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 		System.out.println("visitArrayVariable");
 		String id = ctx.getChild(0).getText();
 		String number = visit(ctx.getChild(2));
-		if((symbolTablePerScope.peek().lookup(id, 0) != 0) && (number.equals("int"))){
-			Integer scope_number_up = symbolTablePerScope.peek().lookup(id, 0);
-			System.out.println(String.valueOf(scope_number_up));
-			return symbolTablePerScope.peek().getType(id, scope_number_up);
+		if(number.equals("int")){
+			if((symbolTablePerScope.peek().lookup(id, 0) != 0) && (number.equals("int"))){
+				Integer scope_number_up = symbolTablePerScope.peek().lookup(id, 0);
+				System.out.println(String.valueOf(scope_number_up));
+				if(symbolTablePerScope.peek().isArray(id, scope_number_up)){
+					return symbolTablePerScope.peek().getType(id, scope_number_up);
+				}
+			}
 		}
 		return "Error";
 	}

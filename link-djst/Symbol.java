@@ -9,11 +9,13 @@ public class Symbol {
 	public Integer arraySize;
 	public ArrayList<String> parameters;
 	public String returnType;
+	public SymbolTable variables;
 	
 	//Struct Constructor
-	public Symbol(String id, String returnType){
+	public Symbol(String id, SymbolTable variables, String returnType){
 		this.id = id;
 		this.isStruct = true;
+		this.variables = variables;
 	}
 	
 	//Method Constructor
