@@ -54,7 +54,7 @@ program: CLASS ID LBRACE (declaration)* RBRACE;
 
 declaration: structDeclaration | varDeclaration | methodDeclaration;
 			
-varDeclaration: varType ID DOTCOMMA | varType ID LCORCH NUM RCORCH DOTCOMMA | ID ID DOTCOMMA ;
+varDeclaration: varType ID DOTCOMMA | varType ID LCORCH NUM RCORCH DOTCOMMA | ID ID DOTCOMMA | ID ID LCORCH NUM RCORCH DOTCOMMA;
 
 structDeclaration: STRUCT ID LBRACE (varDeclaration)* RBRACE;
 
@@ -81,7 +81,7 @@ print: PRINT LPARENT ( STRING | location ) RPARENT DOTCOMMA;
 scan: SCAN LPARENT RPARENT;
 
 ifBlock: IF LPARENT orExpression RPARENT block elseBlock;
-elseBlock: ELSE ifBlock | /* epsilon */;
+elseBlock: ELSE ifBlock | ELSE block | /* epsilon */;
 location: declaredVariable | dotLocation;
 dotLocation: variable ( DOT location) | arrayVariable ( DOT location);
 declaredVariable: variable | arrayVariable;

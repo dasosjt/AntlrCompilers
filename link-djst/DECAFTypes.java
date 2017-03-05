@@ -43,7 +43,6 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 		System.out.println("--Scope counter : "+scope_counter);
 		if(symbolTablePerScope.peek().lookup(id, 0) == 0){
 			//scope counter plus;
-			//
 			scope_counter += 1;
 			//father
 			SymbolTable symbTable = new SymbolTable(scope_counter, symbolTablePerScope.peek());
@@ -53,13 +52,15 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 			symbolTablePerScope.peek().children.add(symbTable);
 			//new current symbTable
 			symbolTablePerScope.push(symbTable);
+			String result = visitChildren(ctx);
+			symbolTablePerScope.pop();
+			//add struct[]
+			symbolTablePerScope.peek().insert(id+"[]", new Symbol(id+"[]", symbTable, id+"[]"));
+			symbolTablePerScope.peek().print();
+			return result;
 		} else {
 			return "Error";
 		}
-		String result = visitChildren(ctx);
-		symbolTablePerScope.pop();
-		return result;
-
 	}
 	
 	@Override
@@ -253,7 +254,7 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 			System.out.println("**or : "+or);
 			System.out.println("**andExpressionType : "+andExpression);
 			if(orExpression.equals(andExpression)){
-				return orExpression;
+				return "boolean";
 			} else {
 				return "Error";
 			}
@@ -286,7 +287,7 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 		} else {
 			//equalsExpression
 			String equalsExpression = visitChildren(ctx);
-			System.out.println("**equalsExpressionType :"+equalsExpression);
+			System.out.println("**equalsExpressionType : "+equalsExpression);
 			return equalsExpression;
 		}
 	}
@@ -305,8 +306,8 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 			System.out.println("**eq_op : "+eq_op);
 			System.out.println("**relationExpressionType : "+relationExpression);
 			//both most be boolean
-			if((equalsExpression.equals(relationExpression)) && (equalsExpression.equals("boolean"))){
-				return equalsExpression;
+			if(equalsExpression.equals(relationExpression)){
+				return "boolean";
 			} else {
 				return "Error";
 			}
@@ -332,7 +333,7 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 			System.out.println("**rel_op : "+rel_op);
 			System.out.println("**addSubsExpression : "+addSubsExpression);
 			if((relationExpression.equals(addSubsExpression)) && (relationExpression.equals("int"))){
-				return relationExpression;
+				return "boolean";
 			} else {
 				return "Error";
 			}
