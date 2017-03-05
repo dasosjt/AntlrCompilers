@@ -227,5 +227,6 @@ class TabbedPanel extends JFrame {
 		DECAFTypes visitor = new DECAFTypes();
 		String result = visitor.visit(tree);
 		System.out.println(result);
+		areaError.append(visitor.errors.toString());
 	}
 }

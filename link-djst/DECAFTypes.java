@@ -6,6 +6,7 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 	public ArrayList<SymbolTable> symbolTablePerScopeArray;
 	public SymbolTable globalTable;
 	public String locationDotLocation;
+	public StringBuffer errors;
 		
 	public DECAFTypes(){
 		scope_counter = 0;
@@ -13,6 +14,7 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 		symbolTablePerScopeArray = new ArrayList<SymbolTable>();
 		scope_counter += 1;
 		globalTable = new SymbolTable(scope_counter, null);
+		errors = new StringBuffer("Symbol and Type Errors : \n");
 	}
 		
 	//Declaration Scope
@@ -30,6 +32,7 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 			//System.out.println("Symbol Table "+SymbolTable);
 			return result;
 		} else {
+			errors.append("--No main method declared in global scope\n");
 			return "Error";
 		}
 
@@ -59,6 +62,9 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 			symbolTablePerScope.peek().print();
 			return result;
 		} else {
+			errors.append("--Struct ");
+			errors.append(id);
+			errors.append(" has been already defined\n");
 			return "Error";
 		}
 	}
@@ -112,6 +118,9 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 			//new current symbTable
 			symbolTablePerScope.push(symbTable);
 		} else {
+			errors.append("--MethodDeclaration ");
+			errors.append(id);
+			errors.append(" has already been defined\n");
 			return "Error";
 		}
 		System.out.println("--Scope counter : "+scope_counter);
@@ -137,6 +146,9 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 			symbolTablePerScope.peek().print();
 			return "";
 		} else {
+			errors.append("--ParameterDeclaration ");
+			errors.append(id);
+			errors.append(" has already been declared in the same scope\n");
 			return "Error";
 		}
 	}
@@ -162,6 +174,9 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 			String result = visitChildren(ctx);
 			return result;
 		} else {
+			errors.append("--VarDeclaration ");
+			errors.append(id);
+			errors.append(" has already been declared in the same scope\n");
 			return "Error";
 		}
 	}
@@ -186,6 +201,9 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 		symbolTablePerScope.pop();
 		if(!bool.equals("boolean")){
 			System.out.println("Error boolean");
+			errors.append("--IfBlock ");
+			errors.append(" ");
+			errors.append(" parameter is not a boolean type");
 			return "Error";	
 		}
 		System.out.println("Its boolean");
@@ -209,6 +227,9 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 		symbolTablePerScope.pop();
 		if(!bool.equals("boolean")){
 			System.out.println("Error boolean");
+			errors.append("--WhileBlock ");
+			errors.append("  ");
+			errors.append(" parameter is not a boolean type");
 			return "Error";
 		}
 		System.out.println("Its boolean");
@@ -252,6 +273,9 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 			return location;
 		} else {
 			System.out.println("Error");
+			errors.append("--Assignation ");
+			errors.append(" ");
+			errors.append(" types are different");
 			return "Error";
 		}
 	}
@@ -274,6 +298,9 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 			if(orExpression.equals(andExpression)){
 				return "boolean";
 			} else {
+				errors.append("--OrExpression ");
+				errors.append("  ");
+				errors.append("  types are different");
 				return "Error";
 			}
 		} else {
@@ -300,6 +327,9 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 			if(andExpression.equals(equalsExpression)){
 				return andExpression;
 			} else {
+				errors.append("--AndExpression");
+				errors.append("   ");
+				errors.append("  types are different");
 				return "Error";
 			}
 		} else {
@@ -327,6 +357,9 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 			if(equalsExpression.equals(relationExpression)){
 				return "boolean";
 			} else {
+				errors.append("--EqualExpression ");
+				errors.append("  ");
+				errors.append("  types are different");
 				return "Error";
 			}
 		} else {
@@ -353,6 +386,9 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 			if((relationExpression.equals(addSubsExpression)) && (relationExpression.equals("int"))){
 				return "boolean";
 			} else {
+				errors.append("--RelationExpression ");
+				errors.append("  ");
+				errors.append("  types are different or are not int");
 				return "Error";
 			}
 		} else {
@@ -382,6 +418,9 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 			if((addSubsExpression.equals(mulDivExpression)) && (addSubsExpression.equals("int"))){
 				return addSubsExpression;
 			} else {
+				errors.append("--AddSubExpression ");
+				errors.append("  ");
+				errors.append("  types are different or are not type int");
 				return "Error";
 			}
 		} else {
@@ -410,6 +449,9 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 			if((mulDivExpression.equals(prExpression)) && (mulDivExpression.equals("int"))){
 				return mulDivExpression;
 			} else {
+				errors.append("--MulDivExpression ");
+				errors.append("  ");
+				errors.append("  types are different or are not type int");
 				return "Error";
 			}
 		} else {
@@ -452,6 +494,10 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 			System.out.println(String.valueOf(scope_number_up));
 			return symbolTablePerScope.peek().getType(id, scope_number_up);
 		}
+
+		errors.append("--DeclaredMethodCall ");
+		errors.append("  ");
+		errors.append("  not found the method\n");
 		return "Error";
 
 	}
@@ -534,6 +580,9 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 			System.out.println(String.valueOf(scope_number_up));
 			return symbolTablePerScope.peek().getType(id, scope_number_up);
 		}
+		errors.append("--Variable ");
+		errors.append("  ");
+		errors.append("  not found the variable\n");
 		return "Error";
 	}
 
@@ -551,6 +600,9 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 				}
 			}
 		}
+		errors.append("--ArrayVariable ");
+		errors.append("  ");
+		errors.append("  not found the array variable\n");
 		return "Error";
 	}
 	
