@@ -5,6 +5,7 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 	public Stack<SymbolTable> symbolTablePerScope;
 	public ArrayList<SymbolTable> symbolTablePerScopeArray;
 	public SymbolTable globalTable;
+	public String locationDotLocation;
 		
 	public DECAFTypes(){
 		scope_counter = 0;
@@ -19,6 +20,7 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 	@Override
 	public String visitProgram(DECAFParser.ProgramContext ctx){
 		System.out.println("visitProgram");
+		locationDotLocation = "";
 		//System.out.println(ctx.getText());
 		symbolTablePerScope.push(globalTable);
 		System.out.println("--Scope counter : " + String.valueOf(scope_counter));
@@ -436,42 +438,69 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 	}
 
 	//Location
+	//This needs improvement
 	
 	@Override 
 	public String visitLocation(DECAFParser.LocationContext ctx){
 		System.out.println("visitLocation");
-		if(ctx.getChild(0).getChildCount() == 3 && ctx.getChild(0).getChild(2).getChild(0).getChildCount() == 1){
-			System.out.println("variable/arraVariable ( DOT Location )");
-			String id = ctx.getChild(0).getChild(0).getChild(0).getText();
-			//So.. we have to track down this variable in struct declaration..
-			//and all the struct declaration belongs to the global scope.
-			System.out.println("variable/arrayVariable ID : "+id);
-			String var = visit(ctx.getChild(0).getChild(2));
-			System.out.println("var : "+ var);
-			globalTable.print();
-			Integer level = symbolTablePerScope.peek().lookup(id, 0);
-			if(level != 0){
-				String structType = symbolTablePerScope.peek().getType(id, level);
-				if(globalTable.lookupGlobal(structType)){
-					System.out.println("Found "+ structType + " in GlobalTable");
-					if(globalTable.searchSymbol(structType).variables.lookup(var, 0) == 1){
-						System.out.println("we have found that symbol ID in its variables has the variable..\n so we need to return the type");
-						Integer structVariableTypeLevel = globalTable.searchSymbol(structType).variables.lookup(var, 0);
-						return globalTable.searchSymbol(structType).variables.getType(var, structVariableTypeLevel);
-					}
-				}
+		if(ctx.getChild(0).getChildCount() == 3 && ctx.getChild(0).getChild(2).getChild(0).getChildCount() == 3){
+			System.out.println("CASE 2");
+			if(!locationDotLocation.equals("")){
+				System.out.println("CASE 2 -> CASE 2");
+				System.out.println("locationDotLocation : "+locationDotLocation);
+				String variable = ctx.getChild(0).getChild(0).getText();
+				System.out.println(variable);
+				locationDotLocation = globalTable.searchSymbol(locationDotLocation).variables.getType(variable, 1);
+				System.out.println("new locationDotLocation : "+locationDotLocation);
+				String location = visit(ctx.getChild(0).getChild(2));
+				System.out.println(location);
+				return location;	
+			} else {
+				locationDotLocation = visit(ctx.getChild(0).getChild(0));
+				System.out.println("locationDotLocation : "+ locationDotLocation);
+				String location = visit(ctx.getChild(0).getChild(2));
+				locationDotLocation = "";
+				return location;
 			}
-		} else if(ctx.getChild(0).getChildCount() == 3 && ctx.getChild(0).getChild(2).getChild(0).getChildCount() == 3){
-			System.out.println("looking for the real");
-			return visit(ctx.getChild(0).getChild(2));
-		} else {
-			System.out.println("Just Location");
-			String id = ctx.getChild(0).getChild(0).getText();
-			System.out.println("Location ID : "+id);
-			return id;
-		}
-		return "Error";
+				
+		} else if(ctx.getChild(0).getChildCount() == 3 && ctx.getChild(0).getChild(2).getChild(0).getChildCount() == 1){
+			System.out.println("CASE 3");
+			if(!locationDotLocation.equals("")){
+				System.out.println("CASE 2 -> CASE 3");
+				//We have passed trough case 2
+				System.out.println("locationDotLocation : " + locationDotLocation);
+				String variable = ctx.getChild(0).getChild(0).getText();
+				System.out.println(variable);
+				locationDotLocation = globalTable.searchSymbol(locationDotLocation).variables.getType(variable, 1);
+				System.out.println("new locationDotLocation : "+locationDotLocation);
+				String location = visit(ctx.getChild(0).getChild(2));
+				System.out.println(location);
+				return location;
 
+			} else {
+				System.out.println("only CASE 3");
+				String idType = visit(ctx.getChild(0).getChild(0));
+				System.out.println(idType);
+				String variable = ctx.getChild(0).getChild(2).getChild(0).getText();
+				String resultType = globalTable.searchSymbol(idType).variables.getType(variable, 1);
+				System.out.println("Result Type of locationDotLocation "+resultType);
+				return resultType;
+			}
+		} else {
+			System.out.println("CASE 1");
+			if(!locationDotLocation.equals("")){
+				System.out.println("CASE 2 -> CASE 3 -> CASE 1");
+				String variable = ctx.getChild(0).getChild(0).getText();
+				System.out.println(variable);
+				String resultType = globalTable.searchSymbol(locationDotLocation).variables.getType(variable, 1);
+				System.out.println("Result Type of locationDotLocation "+resultType);
+				return resultType;
+
+			}
+			return visitChildren(ctx);
+			
+		}
+	
 	}
 
 	//Variable location
