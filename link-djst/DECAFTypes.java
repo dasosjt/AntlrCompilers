@@ -177,12 +177,15 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 		symbolTablePerScope.push(symbTable);
 		//IF LPARENT orExpression RPARENT block elseBlock
 		String bool = visit(ctx.getChild(2));
+		System.out.println(bool);
 		String block = visit(ctx.getChild(4));
 		String elseBlock = visit(ctx.getChild(5));
 		symbolTablePerScope.pop();
 		if(!bool.equals("boolean")){
+			System.out.println("Error boolean");
 			return "Error";	
 		}
+		System.out.println("Its boolean");
 		return "";
 	}
 
@@ -202,8 +205,10 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 		String block = visit(ctx.getChild(4));
 		symbolTablePerScope.pop();
 		if(!bool.equals("boolean")){
+			System.out.println("Error boolean");
 			return "Error";
 		}
+		System.out.println("Its boolean");
 		return "";
 	}
 
