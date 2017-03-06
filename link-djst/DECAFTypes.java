@@ -8,6 +8,8 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 	public String locationDotLocation;
 	public StringBuffer errors;
 	public String methodReturnType;
+	public boolean visitReturnBlock;
+	public boolean visitMain;
 		
 	public DECAFTypes(){
 		scope_counter = 0;
@@ -17,6 +19,8 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 		globalTable = new SymbolTable(scope_counter, null);
 		errors = new StringBuffer();
 		methodReturnType = "";
+		visitReturnBlock = false;
+		visitMain = false;
 	}
 		
 	//Declaration Scope
@@ -29,7 +33,7 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 		symbolTablePerScope.push(globalTable);
 		System.out.println("--Scope counter : " + String.valueOf(scope_counter));
 		String result = visitChildren(ctx);
-		if(symbolTablePerScope.peek().lookup("main", 0) == 1){
+		if((symbolTablePerScope.peek().lookup("main", 0) == 1) || visitMain ){
 			symbolTablePerScope.pop();
 			//System.out.println("Symbol Table "+SymbolTable);
 			return result;
@@ -79,6 +83,9 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 		ArrayList<String> parameters = new ArrayList<String>();
 		String signature = "";
 		String id = ctx.getChild(1).getText();
+		if(id.equals("main")){
+			visitMain = true;
+		}
 		String varType = ctx.getChild(0).getText();
 		methodReturnType = varType;
 		//We want the production that has x parameters, so x = childCount - 5
@@ -128,11 +135,29 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 			errors.append(" in line ");
 			errors.append(ctx.getStart().getLine());
 			errors.append(" has been already defined\n");
+			methodReturnType = "";
+			symbolTablePerScope.pop();
 			return "Error";
 		}
 		System.out.println("--Scope counter : "+scope_counter);
 		String result = visitChildren(ctx);
+		if(visitReturnBlock && methodReturnType.equals("void")){
+			errors.append("--MethodDeclaration ");
+			errors.append(id);
+			errors.append(" in line ");
+			errors.append(ctx.getStart().getLine());
+			errors.append(" return void but has a return block with other type");
+			result = "Error";
+		} else if(!methodReturnType.equals("void") && !visitReturnBlock){
+			errors.append("--MethodDeclaration ");
+			errors.append(id);
+			errors.append(" in line ");
+			errors.append(ctx.getStart().getLine());
+			errors.append(" return block missing");
+			result = "Error";
+		}
 		methodReturnType = "";
+		visitReturnBlock = false;
 		symbolTablePerScope.pop();
 		return result;
 	}
@@ -141,6 +166,7 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 	public String visitReturnBlock(DECAFParser.ReturnBlockContext ctx){
 		System.out.println("visitReturnBlock");
 		System.out.println(methodReturnType);
+		visitReturnBlock = true;
 		//RETURN (nExpression) DOTCOMMA ;
 		String currentReturnType = visit(ctx.getChild(1));
 		if(methodReturnType.equals(currentReturnType)){
@@ -305,6 +331,17 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 			errors.append(" the types are different\n");
 			return "Error";
 		}
+	}
+
+	//basic
+
+	@Override
+	public String visitBasic(DECAFParser.BasicContext ctx){
+		System.out.println("visitBasic");
+		if(ctx.getChild(0).getChildCount() == 3){
+			return visit(ctx.getChild(0).getChild(1));
+		}
+		return visitChildren(ctx);
 	}
 
 	//AND, EQ, OR and RELATION operations
