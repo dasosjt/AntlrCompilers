@@ -7,6 +7,7 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 	public SymbolTable globalTable;
 	public String locationDotLocation;
 	public StringBuffer errors;
+	public String methodReturnType;
 		
 	public DECAFTypes(){
 		scope_counter = 0;
@@ -14,7 +15,8 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 		symbolTablePerScopeArray = new ArrayList<SymbolTable>();
 		scope_counter += 1;
 		globalTable = new SymbolTable(scope_counter, null);
-		errors = new StringBuffer("Symbol and Type Errors : \n");
+		errors = new StringBuffer();
+		methodReturnType = "";
 	}
 		
 	//Declaration Scope
@@ -64,6 +66,8 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 		} else {
 			errors.append("--Struct ");
 			errors.append(id);
+			errors.append(" in line ");
+			errors.append(ctx.getStart().getLine());
 			errors.append(" has been already defined\n");
 			return "Error";
 		}
@@ -76,6 +80,7 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 		String signature = "";
 		String id = ctx.getChild(1).getText();
 		String varType = ctx.getChild(0).getText();
+		methodReturnType = varType;
 		//We want the production that has x parameters, so x = childCount - 5
 		//The number 5 is because of the normal parameters that always appear
 		if(ctx.getChildCount() > 5){
@@ -120,13 +125,34 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 		} else {
 			errors.append("--MethodDeclaration ");
 			errors.append(id);
-			errors.append(" has already been defined\n");
+			errors.append(" in line ");
+			errors.append(ctx.getStart().getLine());
+			errors.append(" has been already defined\n");
 			return "Error";
 		}
 		System.out.println("--Scope counter : "+scope_counter);
 		String result = visitChildren(ctx);
+		methodReturnType = "";
 		symbolTablePerScope.pop();
 		return result;
+	}
+
+	@Override
+	public String visitReturnBlock(DECAFParser.ReturnBlockContext ctx){
+		System.out.println("visitReturnBlock");
+		System.out.println(methodReturnType);
+		//RETURN (nExpression) DOTCOMMA ;
+		String currentReturnType = visit(ctx.getChild(1));
+		if(methodReturnType.equals(currentReturnType)){
+			return "";
+		}
+		errors.append("--ReturnBlock Method type is ");
+		errors.append(methodReturnType);
+		errors.append(" and the return type is ");
+		errors.append(currentReturnType);
+		errors.append(" in line ");
+		errors.append(ctx.getStart().getLine());
+		return "Error";
 	}
 
 	@Override
@@ -148,7 +174,9 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 		} else {
 			errors.append("--ParameterDeclaration ");
 			errors.append(id);
-			errors.append(" has already been declared in the same scope\n");
+			errors.append(" in line ");
+			errors.append(ctx.getStart().getLine());
+			errors.append(" has been already defined in the same scope\n");
 			return "Error";
 		}
 	}
@@ -176,7 +204,9 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 		} else {
 			errors.append("--VarDeclaration ");
 			errors.append(id);
-			errors.append(" has already been declared in the same scope\n");
+			errors.append(" in line ");
+			errors.append(ctx.getStart().getLine());
+			errors.append(" has been already defined\n");
 			return "Error";
 		}
 	}
@@ -200,10 +230,9 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 		String elseBlock = visit(ctx.getChild(5));
 		symbolTablePerScope.pop();
 		if(!bool.equals("boolean")){
-			System.out.println("Error boolean");
-			errors.append("--IfBlock ");
-			errors.append(" ");
-			errors.append(" parameter is not a boolean type");
+			errors.append("--IfBlock in line ");
+			errors.append(ctx.getStart().getLine());
+			errors.append(" the parameter is not a boolean type\n");
 			return "Error";	
 		}
 		System.out.println("Its boolean");
@@ -226,10 +255,9 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 		String block = visit(ctx.getChild(4));
 		symbolTablePerScope.pop();
 		if(!bool.equals("boolean")){
-			System.out.println("Error boolean");
-			errors.append("--WhileBlock ");
-			errors.append("  ");
-			errors.append(" parameter is not a boolean type");
+			errors.append("--WhileBlock in line ");
+			errors.append(ctx.getStart().getLine());
+			errors.append(" the parameter is not a boolean type\n");
 			return "Error";
 		}
 		System.out.println("Its boolean");
@@ -272,10 +300,9 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 		if(location.equals(expressionscan)){
 			return location;
 		} else {
-			System.out.println("Error");
-			errors.append("--Assignation ");
-			errors.append(" ");
-			errors.append(" types are different");
+			errors.append("--Assignation in line ");
+			errors.append(ctx.getStart().getLine());
+			errors.append(" the types are different\n");
 			return "Error";
 		}
 	}
@@ -298,9 +325,9 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 			if(orExpression.equals(andExpression)){
 				return "boolean";
 			} else {
-				errors.append("--OrExpression ");
-				errors.append("  ");
-				errors.append("  types are different");
+				errors.append("--OrExpression in line ");
+				errors.append(ctx.getStart().getLine());
+				errors.append(" the types are different\n");
 				return "Error";
 			}
 		} else {
@@ -325,11 +352,11 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 			System.out.println("**and : "+and);
 			System.out.println("**equalsExpressionType : "+equalsExpression);
 			if(andExpression.equals(equalsExpression)){
+				errors.append("--AndExpression in line ");
+				errors.append(ctx.getStart().getLine());
+				errors.append(" the types are different\n");
 				return andExpression;
 			} else {
-				errors.append("--AndExpression");
-				errors.append("   ");
-				errors.append("  types are different");
 				return "Error";
 			}
 		} else {
@@ -357,9 +384,9 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 			if(equalsExpression.equals(relationExpression)){
 				return "boolean";
 			} else {
-				errors.append("--EqualExpression ");
-				errors.append("  ");
-				errors.append("  types are different");
+				errors.append("--EqualsExpression in line ");
+				errors.append(ctx.getStart().getLine());
+				errors.append(" the types are different\n");
 				return "Error";
 			}
 		} else {
@@ -386,9 +413,9 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 			if((relationExpression.equals(addSubsExpression)) && (relationExpression.equals("int"))){
 				return "boolean";
 			} else {
-				errors.append("--RelationExpression ");
-				errors.append("  ");
-				errors.append("  types are different or are not int");
+				errors.append("--RelationExpression in line ");
+				errors.append(ctx.getStart().getLine());
+				errors.append(" the types are not int\n");
 				return "Error";
 			}
 		} else {
@@ -418,9 +445,9 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 			if((addSubsExpression.equals(mulDivExpression)) && (addSubsExpression.equals("int"))){
 				return addSubsExpression;
 			} else {
-				errors.append("--AddSubExpression ");
-				errors.append("  ");
-				errors.append("  types are different or are not type int");
+				errors.append("--AddSubsExpression in line ");
+				errors.append(ctx.getStart().getLine());
+				errors.append(" the types are not int\n");
 				return "Error";
 			}
 		} else {
@@ -449,9 +476,9 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 			if((mulDivExpression.equals(prExpression)) && (mulDivExpression.equals("int"))){
 				return mulDivExpression;
 			} else {
-				errors.append("--MulDivExpression ");
-				errors.append("  ");
-				errors.append("  types are different or are not type int");
+				errors.append("--MulDivExpression in line ");
+				errors.append(ctx.getStart().getLine());
+				errors.append(" the types are not int\n");
 				return "Error";
 			}
 		} else {
@@ -496,7 +523,9 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 		}
 
 		errors.append("--DeclaredMethodCall ");
-		errors.append("  ");
+		errors.append(id);
+		errors.append(" in line ");
+		errors.append(ctx.getStart().getLine());
 		errors.append("  not found the method\n");
 		return "Error";
 
@@ -581,7 +610,9 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 			return symbolTablePerScope.peek().getType(id, scope_number_up);
 		}
 		errors.append("--Variable ");
-		errors.append("  ");
+		errors.append(id);
+		errors.append(" in line ");
+		errors.append(ctx.getStart().getLine());
 		errors.append("  not found the variable\n");
 		return "Error";
 	}
@@ -601,7 +632,9 @@ public class DECAFTypes extends DECAFBaseVisitor<String> {
 			}
 		}
 		errors.append("--ArrayVariable ");
-		errors.append("  ");
+		errors.append(id);
+		errors.append(" in line ");
+		errors.append(ctx.getStart().getLine());
 		errors.append("  not found the array variable\n");
 		return "Error";
 	}

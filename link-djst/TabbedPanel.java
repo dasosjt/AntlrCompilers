@@ -213,20 +213,20 @@ class TabbedPanel extends JFrame {
 		treePanel.removeAll();
 		treePanel.add(viewr);
       		// Readn and write errors.
+		areaError.setText("");
 	  	try {
 	  		Errors = Files.readAllLines(file, Charset.forName("UTF-8"));
 		  	Files.deleteIfExists(file);
-			//System.out.println(Errors);
-			areaError.removeAll();
 		  	for (int i = 0; i < Errors.size(); i++) {
 		  		areaError.append("(" + (i + 1) + "): " + Errors.get(i) + "\n");
 		  	}
 		} catch ( IOException e ) {
-		  	//areaError.setText("-- No Errors :D -- ");
 		}
-		DECAFTypes visitor = new DECAFTypes();
-		String result = visitor.visit(tree);
-		System.out.println(result);
-		areaError.append(visitor.errors.toString());
+		if(areaError.getText().equals("")){
+			DECAFTypes visitor = new DECAFTypes();
+			String result = visitor.visit(tree);
+			System.out.println(result);
+			areaError.append(visitor.errors.toString());
+		}
 	}
 }
